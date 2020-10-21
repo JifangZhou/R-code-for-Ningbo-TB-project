@@ -1,0 +1,101 @@
+library(tidyverse)
+library(readxl)
+library(dplyr)
+library(lubridate)
+library(doBy)
+library(plyr)
+library(readr)     
+library(frequency)   
+library(DescTools)
+library(purrr)
+Sys.setenv(JAVA_HOME='C:\\Program Files\\Java\\jre1.8.0_261\\jre')
+library(rJava)
+library(xlsx)
+#IPT_pharm cleaning
+
+setwd("E:/Ningbo Projects/TB/TB project/Raw data/IPT_pharm/")
+ldf <- list() # creates a list
+listxlsx <- dir(pattern = "*.xlsx") # creates the list of all the csv files in the directory
+IPT_pharm <- ldply(listxlsx, read_xlsx)
+
+#select certain drugs
+data_temp<-filter(IPT_pharm, grepl("?????????",item_name) & usage=="??????")
+x<-Freq(data_temp$item_name, ord = "desc")
+data_temp<-filter(IPT_pharm, grepl("????????????",item_name))
+x<-Freq(data_temp$item_name, ord = "desc")
+
+x<-Freq(IPT_pharm$item_name, ord = "desc")
+x<-Freq(OPT_pharm$item_name, ord = "desc")
+summary_dxname<-IPT_pharm %>% 
+  group_by(item_name)  %>% 
+  summarise_at(vars(ALT:Tbil), min, na.rm = TRUE)
+
+#OPT_pharm cleaning
+
+setwd("E:/Ningbo Projects/TB/TB project/Raw data/OPT_pharm/")
+ldf <- list() # creates a list
+listxlsx <- dir(pattern = "*.xlsx") # creates the list of all the csv files in the directory
+OPT_pharm <- ldply(listxlsx, read_xlsx)
+
+data_temp<-filter(OPT_pharm, grepl("?????????",item_name) & tageway_name=="??????")
+x<-Freq(data_temp$item_name, ord = "desc")
+data_temp<-filter(OPT_pharm, grepl("????????????",item_name))
+x<-Freq(data_temp$item_name, ord = "desc")
+
+
+x<-Freq(OPT_pharm$item_name, ord = "desc")
+y<-Freq(IPT_pharm$item_name, ord = "desc")
+
+
+
+
+#Lab results cleaning
+setwd("E:/Ningbo Projects/TB/TB project/Raw data/Raw data/Lab/")
+ldf <- list() # creates a list
+listxlsx <- dir(pattern = "*.xlsx") # creates the list of all the csv files in the directory
+Lab <- ldply(listxlsx, read_xlsx)
+Lab$result_num<-as.numeric(Lab$result)
+
+x<-Freq(Lab$assay_item_name, ord = "desc")
+ALT <- filter(Lab,assay_item_name=="????????????????????????")
+AST <- filter(Lab,assay_item_name=="??????????????????????????????")
+INR <- filter(Lab,assay_item_name=="?????????????????????")
+Tbil <- filter(Lab,assay_item_name=="????????????")
+
+ALT_2above<- filter(Lab,assay_item_name=="????????????????????????" & result_num>100)
+AST_2above<- filter(Lab,assay_item_name=="??????????????????????????????" & result_num>100)
+INR_2above<- filter(Lab,assay_item_name=="?????????????????????" & result_num>2.5)
+Tbil_2above<- filter(Lab,assay_item_name=="????????????" & result_num>40)
+
+names(ALT_2above)[names(ALT_2above)=="result_num"] <- "ALT"
+names(AST_2above)[names(AST_2above)=="result_num"] <- "AST"
+names(INR_2above)[names(INR_2above)=="result_num"] <- "INR"
+names(Tbil_2above)[names(Tbil_2above)=="result_num"] <- "Tbil"
+
+Lab_2above_all<-gtools::smartbind(ALT_2above,AST_2above,INR_2above,Tbil_2above)
+
+summary_lab2<-Lab_2above_all %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(ALT:Tbil), mean, na.rm = TRUE)
+
+#5 times above normal ref
+ALT_5above<- filter(Lab,assay_item_name=="丙氨酸氨基转移酶" & result_num>250)
+AST_5above<- filter(Lab,assay_item_name=="天门冬氨酸氨基转移酶" & result_num>250)
+INR_5above<- filter(Lab,assay_item_name=="国际标准化比值" & result_num>2.5)
+Tbil_5above<- filter(Lab,assay_item_name=="总胆红素" & result_num>100)
+
+names(ALT_5above)[names(ALT_5above)=="result_num"] <- "ALT"
+names(AST_5above)[names(AST_5above)=="result_num"] <- "AST"
+names(INR_5above)[names(INR_5above)=="result_num"] <- "INR"
+names(Tbil_5above)[names(Tbil_5above)=="result_num"] <- "Tbil"
+
+Lab_5above_all<-gtools::smartbind(ALT_5above,AST_5above,INR_5above,Tbil_5above)
+
+summary_lab5<-Lab_5above_all %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(ALT:Tbil), min, na.rm = TRUE)
+
+summary_lab2$DILI_Lab_2=1
+summary_lab5$DILI_Lab_5=1
+
+write_xlsx(x, file = "mydrugbook.xlsx", sheetName = "OPT_Rx_file")
