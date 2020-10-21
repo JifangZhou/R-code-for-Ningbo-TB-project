@@ -1,0 +1,41 @@
+#Drug utilization assessment
+library(tidyverse)
+library(readxl)
+library(dplyr)
+library(lubridate)
+library(doBy)
+library(plyr)
+library(readr)     
+library(frequency)   
+library(DescTools)
+library(purrr)
+library(rJava)
+library(xlsx)
+library(dostats)
+#load IPT drug files
+setwd("E:/Ningbo Projects/TB/TB project/Workingd/CSV files/")
+Sys.setlocale(category = "LC_ALL",local="chinese")
+IPT<-read_csv("IPT.csv")
+OPT<-read_csv("OPT.csv")
+IPT_pharm<-read_csv("IPT_pharm.csv")
+OPT_pharm<-read_csv("OPT_pharm.csv")
+
+id_list<-read_csv("id_list_1015.csv")
+id_list$Dx_year <- year(id_list$Dx_date)
+id_list$age<-id_list$Dx_year-id_list$Yob
+
+
+x<-Freq(id_list$Dx_year)
+Lab_1<-read_csv("Lab1.csv")
+Lab_2<-read_csv("Lab2.csv")
+#Assessment of HBV HbS-Ag status
+Lab1_index <- inner_join(Lab_1,id_list, by = "idcard") 
+Lab1_Hbs<-filter(Lab1_index, grepl("表面抗原",assay_item_name))
+
+
+x<-Freq(Lab1_Hbs$result)
+
+Lab1_index$<- as.Date(Case_all_index$Dx_date)
+Case_all_index$Rx_end_date<- as.Date(Case_all_index$Rx_end_date)
+
+Case_pre_index<-Case_all_index [Case_all_index$Case_time<Case_all_index$Dx_date,]
