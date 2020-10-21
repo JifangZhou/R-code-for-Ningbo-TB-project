@@ -1,0 +1,151 @@
+#outcome data cleaning
+library(tidyverse)
+library(readxl)
+library(dplyr)
+library(lubridate)
+library(doBy)
+library(plyr)
+library(readr)     
+library(frequency)   
+library(DescTools)
+library(purrr)
+library(rJava)
+library(xlsx)
+library(dostats)
+
+setwd("E:/Ningbo Projects/TB/TB project/Raw data/Outcome/")
+ldf <- list() # creates a list
+listxlsx <- dir(pattern = "*.xlsx") # creates the list of all the csv files in the directory
+Outcome <- ldply(listxlsx, read_xlsx)
+Outcome$Reg_date<-as.Date(Outcome$Reg_date)
+Outcome$Onset_date<-as.Date(Outcome$Onset_date)
+Outcome$First_visit_date<-as.Date(Outcome$First_visit_date)
+Outcome$Dx_date<-as.Date(Outcome$Dx_date)
+Outcome$M2_sputum_date<-as.Date(Outcome$M2_sputum_date)
+Outcome$M3_sputum_date<-as.Date(Outcome$M3_sputum_date)
+Outcome$M5_sputum_date<-as.Date(Outcome$M5_sputum_date)
+Outcome$Rx_date<-as.Date(Outcome$Rx_date)
+Outcome$Rx_end_date<-as.Date(Outcome$Rx_end_date)
+
+
+
+id_list<-read_xlsx("E:/Ningbo Projects/TB/TB project/Workingd/CSV files/id_list_1010.xlsx")
+
+summary_id<-Outcome %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Sex), min, na.rm = TRUE)
+
+colnames(summary_id)[colnames(summary_id) %in% c("Sex")] <- c("Sex_outcome_list")
+#Join with primary file
+id_list1 <- inner_join(id_list, summary_id, by = "idcard") 
+
+summary_id<-Outcome %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Reg_region), min, na.rm = TRUE)
+
+summary_id$Reg_region[!( summary_id$Reg_region=="浙江省宁波市余姚市" |
+                           summary_id$Reg_region=="浙江省宁波市北仑区" |
+                           summary_id$Reg_region=="浙江省宁波市奉化区" |
+                           summary_id$Reg_region=="浙江省宁波市宁海县" |
+                           summary_id$Reg_region=="浙江省宁波市慈溪市" |
+                           summary_id$Reg_region=="浙江省宁波市海曙区" |
+                           summary_id$Reg_region=="浙江省宁波市象山县" |
+                           summary_id$Reg_region=="浙江省宁波市鄞州区" |
+                           summary_id$Reg_region=="浙江省宁波市镇海区" )]<-"Out_of_ningbo"
+summary_id$Reg_region[summary_id$Reg_region=="浙江省宁波市余姚市"]<-"Yuyao"
+summary_id$Reg_region[summary_id$Reg_region=="浙江省宁波市北仑区"]<-"Beilun"
+summary_id$Reg_region[summary_id$Reg_region=="浙江省宁波市奉化区"]<-"Fenhua"
+summary_id$Reg_region[summary_id$Reg_region=="浙江省宁波市宁海县"]<-"Ninghai"
+summary_id$Reg_region[summary_id$Reg_region=="浙江省宁波市慈溪市"]<-"Cixi"
+summary_id$Reg_region[summary_id$Reg_region=="浙江省宁波市海曙区"]<-"Haisu"
+summary_id$Reg_region[summary_id$Reg_region=="浙江省宁波市象山县"]<-"Xiangsan"
+summary_id$Reg_region[summary_id$Reg_region=="浙江省宁波市鄞州区"]<-"Yinzhou"
+summary_id$Reg_region[summary_id$Reg_region=="浙江省宁波市镇海区"]<-"Zhenhai"
+
+#Join region with primary file
+id_list2 <- inner_join(id_list1, summary_id, by = "idcard") 
+
+summary_id<-Outcome %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Reg_org), min, na.rm = TRUE)
+
+#Join org name
+id_list3 <- inner_join(id_list2, summary_id, by = "idcard") 
+
+summary_id<-Outcome %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Dx_type...11), min, na.rm = TRUE)
+colnames(summary_id)[colnames(summary_id) %in% c("Dx_type...11")] <- c("Dx_type")
+summary_id$Dx_type[summary_id$Dx_type=="初治"]<-"Primary"
+summary_id$Dx_type[summary_id$Dx_type=="复治"]<-"Retreat"
+
+#Join treatment type
+id_list4 <- inner_join(id_list3, summary_id, by = "idcard") 
+
+summary_id<-Outcome %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Hukou), min, na.rm = TRUE)
+summary_id$Hukou[summary_id$Hukou=="本地"]<-"Local"
+summary_id$Hukou[summary_id$Hukou=="市内流动"]<-"Within_city"
+summary_id$Hukou[summary_id$Hukou=="市间流动(省内流动)"]<-"Inter_city"
+summary_id$Hukou[summary_id$Hukou=="省间流动"]<-"Within_prov"
+summary_id$Hukou[summary_id$Hukou=="外籍"]<-"International"
+#add Hukou type
+id_list5 <- inner_join(id_list4, summary_id, by = "idcard") 
+
+
+summary_id<-Outcome %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(DR_status), min, na.rm = TRUE)
+id_list6 <- inner_join(id_list5, summary_id, by = "idcard") 
+
+#Dx, Rx and End Date
+summary_id<-Outcome %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Dx_date), min, na.rm = TRUE)
+id_list7 <- inner_join(id_list6, summary_id, by = "idcard") 
+summary_id<-Outcome %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Rx_date), min, na.rm = TRUE)
+id_list8 <- inner_join(id_list7, summary_id, by = "idcard") 
+summary_id<-Outcome %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Rx_end_date), min, na.rm = TRUE)
+id_list9 <- inner_join(id_list8, summary_id, by = "idcard") 
+summary_id<-Outcome %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Rx_end_reason), min, na.rm = TRUE)
+id_list10 <- inner_join(id_list9, summary_id, by = "idcard") 
+
+summary_id$Rx_end_reason[summary_id$Rx_end_reason=="不良反应"]<-"ADR"
+summary_id$Rx_end_reason[summary_id$Rx_end_reason=="丢失"]<-"Lost_to_folup"
+summary_id$Rx_end_reason[summary_id$Rx_end_reason=="其它"]<-"Other"
+summary_id$Rx_end_reason[summary_id$Rx_end_reason=="失败"]<-"Failure"
+summary_id$Rx_end_reason[summary_id$Rx_end_reason=="完成疗程"]<-"Rx_completion"
+summary_id$Rx_end_reason[summary_id$Rx_end_reason=="治愈"]<-"Cured"
+summary_id$Rx_end_reason[summary_id$Rx_end_reason=="结核死亡"]<-"Death_to_TB"
+summary_id$Rx_end_reason[summary_id$Rx_end_reason=="诊断变更"]<-"Dx_changed"
+summary_id$Rx_end_reason[summary_id$Rx_end_reason=="转入耐多药治疗"]<-"MDR_TB"
+summary_id$Rx_end_reason[summary_id$Rx_end_reason=="非结核死亡"]<-"non_TB_Death"
+
+colnames(summary_id)[colnames(summary_id) %in% c("Rx_end_reason")] <- c("Outcome_type")
+id_list11 <- inner_join(id_list10, summary_id, by = "idcard") 
+
+write.xlsx(id_list11, file = "id_list_1013.xlsx", sheetName = "id_list")
+
+
+
+
+
+
+
+x<-Freq(summary_id$Rx_end_reason)
+
+
+x<-Freq(id_list2$Reg_region)
+write.xlsx(x, file = "temp.xlsx", sheetName = "temp")
+
+
+
+
+prop.table(table(id_list1$Sex.x,id_list1$Sex.y))
