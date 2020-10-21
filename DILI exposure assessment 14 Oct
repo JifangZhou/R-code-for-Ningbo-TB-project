@@ -1,0 +1,414 @@
+library(tidyverse)
+library(readxl)
+library(dplyr)
+library(lubridate)
+library(doBy)
+library(plyr)
+library(readr)     
+library(frequency)   
+library(DescTools)
+library(purrr)
+library(rJava)
+library(xlsx)
+library(dostats)
+#Assessment of exposure for DILI cont'd 14 Oct
+#Load IPT OPT and Pharm files
+setwd("E:/Ningbo Projects/TB/TB project/Workingd/CSV files/")
+Sys.setlocale(category = "LC_ALL",local="chinese")
+IPT<-read_csv("IPT.csv")
+OPT<-read_csv("OPT.csv")
+IPT_pharm<-read_csv("IPT_pharm.csv")
+OPT_pharm<-read_csv("OPT_pharm.csv")
+
+id_list<-read.csv("id_list_1014_morning.csv")
+Lab_ALT<-read.csv("Lab_ALT_1014.csv")
+Lab_ALP<-read.csv("Lab_ALP_1014.csv")
+Lab_Tbil<-read.csv("Lab_Tbil_1014.csv")
+Lab_INR<-read.csv("Lab_INR_1014.csv")
+
+#Highest grade of DILI during TB treatment
+#Extract relevant clinical variables from the IPT and OPT diagnosis
+Case_OPT_pharm<-filter(OPT_pharm, grepl("腹水",disease_name))
+Case_OPT_pharm$Case_time<-Case_OPT_pharm$clinic_time
+
+Case_OPT<-filter(OPT, grepl("腹水",disease_name))
+Case_OPT$Case_time<-Case_OPT$clinic_time
+
+Case_IPT<-filter(IPT, grepl("腹水",disease_name))
+Case_IPT$Case_time<-Case_IPT$dis_time
+
+Case_OPT_pharm <- Case_OPT_pharm %>% select(idcard, dt_name, Case_time)
+Case_OPT <- Case_OPT %>% select(idcard, dt_name, Case_time)
+Case_IPT <- Case_IPT %>% select(idcard, dt_name, Case_time)
+
+Case_all<-rbind(Case_OPT_pharm,Case_OPT,Case_IPT)
+
+Case_all_index <- inner_join(Case_all,id_list, by = "idcard") 
+Case_all_index$Dx_date<- as.Date(Case_all_index$Dx_date)
+Case_all_index$Rx_end_date<- as.Date(Case_all_index$Rx_end_date)
+
+Case_pre_index<-Case_all_index [Case_all_index$Case_time<Case_all_index$Dx_date,]
+Case_post_index<-Case_all_index [Case_all_index$Case_time>=Case_all_index$Dx_date & Case_all_index$Case_time<=Case_all_index$Rx_end_date,]
+
+#extract DILI dates by IPT diagnosis
+
+summary_Case_pre<-Case_pre_index %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Case_time), min, na.rm = TRUE)
+summary_Case_post<-Case_post_index %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Case_time), min, na.rm = TRUE)
+
+colnames(summary_Case_pre)[colnames(summary_Case_pre) %in% c("Case_time")] <- c("Ascites_pre_dx_date")
+colnames(summary_Case_post)[colnames(summary_Case_post) %in% c("Case_time")] <- c("Ascites_post_dx_date")
+
+id_list1 <- left_join(id_list,  summary_Case_pre,  by = "idcard") 
+id_list2 <- left_join(id_list1, summary_Case_post, by = "idcard") 
+#肝性脑病
+Case_OPT_pharm<-filter(OPT_pharm, grepl("肝性脑病",disease_name))
+Case_OPT_pharm$Case_time<-Case_OPT_pharm$clinic_time
+
+Case_OPT<-filter(OPT, grepl("肝性脑病",disease_name))
+Case_OPT$Case_time<-Case_OPT$clinic_time
+
+Case_IPT<-filter(IPT, grepl("肝性脑病",disease_name))
+Case_IPT$Case_time<-Case_IPT$dis_time
+
+Case_OPT_pharm <- Case_OPT_pharm %>% select(idcard, dt_name, Case_time)
+Case_OPT <- Case_OPT %>% select(idcard, dt_name, Case_time)
+Case_IPT <- Case_IPT %>% select(idcard, dt_name, Case_time)
+
+Case_all<-rbind(Case_OPT_pharm,Case_OPT,Case_IPT)
+
+Case_all_index <- inner_join(Case_all,id_list, by = "idcard") 
+Case_all_index$Dx_date<- as.Date(Case_all_index$Dx_date)
+Case_all_index$Rx_end_date<- as.Date(Case_all_index$Rx_end_date)
+
+Case_pre_index<-Case_all_index [Case_all_index$Case_time<Case_all_index$Dx_date,]
+Case_post_index<-Case_all_index [Case_all_index$Case_time>=Case_all_index$Dx_date & Case_all_index$Case_time<=Case_all_index$Rx_end_date,]
+
+#extract DILI dates by IPT diagnosis
+
+summary_Case_pre<-Case_pre_index %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Case_time), min, na.rm = TRUE)
+summary_Case_post<-Case_post_index %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Case_time), min, na.rm = TRUE)
+
+colnames(summary_Case_pre)[colnames(summary_Case_pre) %in% c("Case_time")] <- c("Hepaence_pre_dx_date")
+colnames(summary_Case_post)[colnames(summary_Case_post) %in% c("Case_time")] <- c("Hepaence_post_dx_date")
+
+id_list3 <- left_join(id_list2,  summary_Case_pre,  by = "idcard") 
+id_list4 <- left_join(id_list3, summary_Case_post, by = "idcard") 
+#肝硬化
+Case_OPT_pharm<-filter(OPT_pharm, grepl("肝硬化",disease_name))
+Case_OPT_pharm$Case_time<-Case_OPT_pharm$clinic_time
+
+Case_OPT<-filter(OPT, grepl("肝硬化",disease_name))
+Case_OPT$Case_time<-Case_OPT$clinic_time
+
+Case_IPT<-filter(IPT, grepl("肝硬化",disease_name))
+Case_IPT$Case_time<-Case_IPT$dis_time
+
+Case_OPT_pharm <- Case_OPT_pharm %>% select(idcard, dt_name, Case_time)
+Case_OPT <- Case_OPT %>% select(idcard, dt_name, Case_time)
+Case_IPT <- Case_IPT %>% select(idcard, dt_name, Case_time)
+
+Case_all<-rbind(Case_OPT_pharm,Case_OPT,Case_IPT)
+
+Case_all_index <- inner_join(Case_all,id_list, by = "idcard") 
+Case_all_index$Dx_date<- as.Date(Case_all_index$Dx_date)
+Case_all_index$Rx_end_date<- as.Date(Case_all_index$Rx_end_date)
+
+Case_pre_index<-Case_all_index [Case_all_index$Case_time<Case_all_index$Dx_date,]
+Case_post_index<-Case_all_index [Case_all_index$Case_time>=Case_all_index$Dx_date & Case_all_index$Case_time<=Case_all_index$Rx_end_date,]
+
+#extract DILI dates by IPT diagnosis
+
+summary_Case_pre<-Case_pre_index %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Case_time), min, na.rm = TRUE)
+summary_Case_post<-Case_post_index %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Case_time), min, na.rm = TRUE)
+
+colnames(summary_Case_pre)[colnames(summary_Case_pre) %in% c("Case_time")] <- c("Cirrhosis_pre_dx_date")
+colnames(summary_Case_post)[colnames(summary_Case_post) %in% c("Case_time")] <- c("Cirrhosis_post_dx_date")
+
+id_list5 <- left_join(id_list4,  summary_Case_pre,  by = "idcard") 
+id_list6 <- left_join(id_list5, summary_Case_post, by = "idcard") 
+#乙型肝炎
+Case_OPT_pharm<-filter(OPT_pharm, grepl("乙型肝炎",disease_name)|grepl("乙肝",disease_name) | grepl("乙型病毒性肝炎",disease_name))
+Case_OPT_pharm$Case_time<-Case_OPT_pharm$clinic_time
+
+Case_OPT<-filter(OPT,  grepl("乙型肝炎",disease_name)|grepl("乙肝",disease_name) | grepl("乙型病毒性肝炎",disease_name))
+Case_OPT$Case_time<-Case_OPT$clinic_time
+
+Case_IPT<-filter(IPT,  grepl("乙型肝炎",disease_name)|grepl("乙肝",disease_name) | grepl("乙型病毒性肝炎",disease_name))
+Case_IPT$Case_time<-Case_IPT$dis_time
+
+Case_OPT_pharm <- Case_OPT_pharm %>% select(idcard, dt_name, Case_time)
+Case_OPT <- Case_OPT %>% select(idcard, dt_name, Case_time)
+Case_IPT <- Case_IPT %>% select(idcard, dt_name, Case_time)
+
+Case_all<-rbind(Case_OPT_pharm,Case_OPT,Case_IPT)
+
+Case_all_index <- inner_join(Case_all,id_list, by = "idcard") 
+Case_all_index$Dx_date<- as.Date(Case_all_index$Dx_date)
+Case_all_index$Rx_end_date<- as.Date(Case_all_index$Rx_end_date)
+
+Case_pre_index<-Case_all_index [Case_all_index$Case_time<Case_all_index$Dx_date,]
+Case_post_index<-Case_all_index [Case_all_index$Case_time>=Case_all_index$Dx_date & Case_all_index$Case_time<=Case_all_index$Rx_end_date,]
+
+#extract DILI dates by IPT diagnosis
+
+summary_Case_pre<-Case_pre_index %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Case_time), min, na.rm = TRUE)
+summary_Case_post<-Case_post_index %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Case_time), min, na.rm = TRUE)
+
+colnames(summary_Case_pre)[colnames(summary_Case_pre) %in% c("Case_time")] <- c("HBV_pre_dx_date")
+colnames(summary_Case_post)[colnames(summary_Case_post) %in% c("Case_time")] <- c("HBV_post_dx_date")
+
+id_list7 <- left_join(id_list6,  summary_Case_pre,  by = "idcard") 
+id_list8 <- left_join(id_list7, summary_Case_post, by = "idcard") 
+
+#丙型肝炎
+Case_OPT_pharm<-filter(OPT_pharm, grepl("丙型肝炎",disease_name)|grepl("丙肝",disease_name) | grepl("丙型病毒性肝炎",disease_name))
+Case_OPT_pharm$Case_time<-Case_OPT_pharm$clinic_time
+
+Case_OPT<-filter(OPT,  grepl("丙型肝炎",disease_name)|grepl("丙肝",disease_name) | grepl("丙型病毒性肝炎",disease_name))
+Case_OPT$Case_time<-Case_OPT$clinic_time
+
+Case_IPT<-filter(IPT,  grepl("丙型肝炎",disease_name)|grepl("丙肝",disease_name) | grepl("丙型病毒性肝炎",disease_name))
+Case_IPT$Case_time<-Case_IPT$dis_time
+
+Case_OPT_pharm <- Case_OPT_pharm %>% select(idcard, dt_name, Case_time)
+Case_OPT <- Case_OPT %>% select(idcard, dt_name, Case_time)
+Case_IPT <- Case_IPT %>% select(idcard, dt_name, Case_time)
+
+Case_all<-rbind(Case_OPT_pharm,Case_OPT,Case_IPT)
+
+Case_all_index <- inner_join(Case_all,id_list, by = "idcard") 
+Case_all_index$Dx_date<- as.Date(Case_all_index$Dx_date)
+Case_all_index$Rx_end_date<- as.Date(Case_all_index$Rx_end_date)
+
+Case_pre_index<-Case_all_index [Case_all_index$Case_time<Case_all_index$Dx_date,]
+Case_post_index<-Case_all_index [Case_all_index$Case_time>=Case_all_index$Dx_date & Case_all_index$Case_time<=Case_all_index$Rx_end_date,]
+
+#extract DILI dates by IPT diagnosis
+
+summary_Case_pre<-Case_pre_index %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Case_time), min, na.rm = TRUE)
+summary_Case_post<-Case_post_index %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Case_time), min, na.rm = TRUE)
+
+colnames(summary_Case_pre)[colnames(summary_Case_pre) %in% c("Case_time")] <- c("HCV_pre_dx_date")
+colnames(summary_Case_post)[colnames(summary_Case_post) %in% c("Case_time")] <- c("HCV_post_dx_date")
+
+id_list9 <- left_join(id_list8,  summary_Case_pre,  by = "idcard") 
+id_list10 <- left_join(id_list9, summary_Case_post, by = "idcard") 
+#肝移植
+Case_OPT_pharm<-filter(OPT_pharm, grepl("肝移植",disease_name))
+Case_OPT_pharm$Case_time<-Case_OPT_pharm$clinic_time
+
+Case_OPT<-filter(OPT,  grepl("肝移植",disease_name))
+Case_OPT$Case_time<-Case_OPT$clinic_time
+
+Case_IPT<-filter(IPT,  grepl("肝移植",disease_name))
+Case_IPT$Case_time<-Case_IPT$dis_time
+
+Case_OPT_pharm <- Case_OPT_pharm %>% select(idcard, dt_name, Case_time)
+Case_OPT <- Case_OPT %>% select(idcard, dt_name, Case_time)
+Case_IPT <- Case_IPT %>% select(idcard, dt_name, Case_time)
+
+Case_all<-rbind(Case_OPT_pharm,Case_OPT,Case_IPT)
+
+Case_all_index <- inner_join(Case_all,id_list, by = "idcard") 
+Case_all_index$Dx_date<- as.Date(Case_all_index$Dx_date)
+Case_all_index$Rx_end_date<- as.Date(Case_all_index$Rx_end_date)
+
+Case_pre_index<-Case_all_index [Case_all_index$Case_time<Case_all_index$Dx_date,]
+Case_post_index<-Case_all_index [Case_all_index$Case_time>=Case_all_index$Dx_date & Case_all_index$Case_time<=Case_all_index$Rx_end_date,]
+
+#extract DILI dates by IPT diagnosis
+
+summary_Case_pre<-Case_pre_index %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Case_time), min, na.rm = TRUE)
+summary_Case_post<-Case_post_index %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Case_time), min, na.rm = TRUE)
+
+colnames(summary_Case_pre)[colnames(summary_Case_pre) %in% c("Case_time")] <- c("Livertrans_pre_dx_date")
+colnames(summary_Case_post)[colnames(summary_Case_post) %in% c("Case_time")] <- c("Livertrans_dx_date")
+
+id_list9 <- left_join(id_list8,  summary_Case_pre,  by = "idcard") 
+id_list10 <- left_join(id_list9, summary_Case_post, by = "idcard") 
+#Lab findings from 1 week of initial acute liver injury will be assessed together as episode of care
+#First occurrence of ALT and ALP exceeding ULN
+#Add index date to the lab files
+Lab_ALT_index <- inner_join(Lab_ALT,id_list, by = "idcard") 
+Lab_ALT_index$report_time<-as.Date(Lab_ALT_index$report_time)
+Lab_ALT_index<-Lab_ALT_index [Lab_ALT_index$report_time>=Lab_ALT_index$Dx_date & Lab_ALT_index$report_time<=Lab_ALT_index$Rx_end_date,]
+Lab_ALT_abn<-Lab_ALT_index[Lab_ALT_index$result>Lab_ALT_index$refrange_hi,]
+summary_Case<-Lab_ALT_abn %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(report_time), min, na.rm = TRUE)
+colnames(summary_Case)[colnames(summary_Case) %in% c("report_time")] <- c("ALT_abn_date")
+id_list11 <- left_join(id_list10, summary_Case, by = "idcard") 
+#First occurrence of ALP abnormal values after TB treatment
+Lab_ALP_index <- inner_join(Lab_ALP,id_list, by = "idcard") 
+Lab_ALP_index$report_time<-as.Date(Lab_ALP_index$report_time)
+Lab_ALP_index<-Lab_ALP_index [Lab_ALP_index$report_time>=Lab_ALP_index$Dx_date & Lab_ALP_index$report_time<=Lab_ALP_index$Rx_end_date,]
+Lab_ALP_abn<-Lab_ALP_index[Lab_ALP_index$result>Lab_ALP_index$refrange_hi,]
+summary_Case<-Lab_ALP_abn %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(report_time), min, na.rm = TRUE)
+colnames(summary_Case)[colnames(summary_Case) %in% c("report_time")] <- c("ALP_abn_date")
+id_list12 <- left_join(id_list11, summary_Case, by = "idcard") 
+
+#Tbil abnormal reach time
+Lab_Tbil_index <- inner_join(Lab_Tbil,id_list, by = "idcard") 
+Lab_Tbil_index$report_time<-as.Date(Lab_Tbil_index$report_time)
+Lab_Tbil_index<-Lab_Tbil_index [Lab_Tbil_index$report_time>=Lab_Tbil_index$Dx_date & Lab_Tbil_index$report_time<=Lab_Tbil_index$Rx_end_date,]
+Lab_Tbil_abn<-Lab_Tbil_index[Lab_Tbil_index$result>=Lab_Tbil_index$refrange_hi*2.5,]
+summary_Case<-Lab_Tbil_abn %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(report_time), min, na.rm = TRUE)
+colnames(summary_Case)[colnames(summary_Case) %in% c("report_time")] <- c("Tbil_25abn_date")
+id_list13 <- left_join(id_list12, summary_Case, by = "idcard") 
+
+Lab_Tbil_index <- inner_join(Lab_Tbil,id_list, by = "idcard") 
+Lab_Tbil_index$report_time<-as.Date(Lab_Tbil_index$report_time)
+Lab_Tbil_index<-Lab_Tbil_index [Lab_Tbil_index$report_time>=Lab_Tbil_index$Dx_date & Lab_Tbil_index$report_time<=Lab_Tbil_index$Rx_end_date,]
+Lab_Tbil_abn<-Lab_Tbil_index[Lab_Tbil_index$result>=Lab_Tbil_index$refrange_hi*5,]
+summary_Case<-Lab_Tbil_abn %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(report_time), min, na.rm = TRUE)
+colnames(summary_Case)[colnames(summary_Case) %in% c("report_time")] <- c("Tbil_5abn_date")
+id_list14 <- left_join(id_list13, summary_Case, by = "idcard") 
+
+Lab_Tbil_index <- inner_join(Lab_Tbil,id_list, by = "idcard") 
+Lab_Tbil_index$report_time<-as.Date(Lab_Tbil_index$report_time)
+Lab_Tbil_index<-Lab_Tbil_index [Lab_Tbil_index$report_time>=Lab_Tbil_index$Dx_date & Lab_Tbil_index$report_time<=Lab_Tbil_index$Rx_end_date,]
+Lab_Tbil_abn<-Lab_Tbil_index[Lab_Tbil_index$result>=Lab_Tbil_index$refrange_hi*10,]
+summary_Case<-Lab_Tbil_abn %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(report_time), min, na.rm = TRUE)
+colnames(summary_Case)[colnames(summary_Case) %in% c("report_time")] <- c("Tbil_10abn_date")
+id_list15 <- left_join(id_list14, summary_Case, by = "idcard") 
+
+#INR
+Lab_INR_index <- inner_join(Lab_INR,id_list, by = "idcard") 
+Lab_INR_index$report_time<-as.Date(Lab_INR_index$report_time)
+Lab_INR_index<-Lab_INR_index [Lab_INR_index$report_time>=Lab_INR_index$Dx_date & Lab_INR_index$report_time<=Lab_INR_index$Rx_end_date,]
+Lab_INR_abn<-Lab_INR_index[Lab_INR_index$result>=1.5,]
+summary_Case<-Lab_INR_abn %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(report_time), min, na.rm = TRUE)
+colnames(summary_Case)[colnames(summary_Case) %in% c("report_time")] <- c("INR_abn_date")
+id_list16 <- left_join(id_list15, summary_Case, by = "idcard") 
+
+write.csv(id_list16,"id_list_105.csv")
+
+write_excel_csv(id_list16,"id_list_1015.csv")
+
+
+id_list16$DILI_post_iptdx_date<-as.Date(id_list16$DILI_post_iptdx_date)
+id_list16$DILI_post_opt1dx_date<-as.Date(id_list16$DILI_post_opt1dx_date)
+id_list<-id_list16
+id_list$any_DILI_3opt[!is.na(id_list$DILI_post_iptdx_date) |
+                   (!is.na(id_list$DILI_post_opt1dx_date) &  id_list$DILI_post_optdx_counted>2) |
+                  ( (!is.na(id_list$ALT_abn_date) |
+                      !is.na(id_list$ALP_abn_date) |
+                      !is.na(id_list$Tbil_25abn_date) |
+                      !is.na(id_list$INR_abn_date) ) & 
+                      (!is.na(id_list$DILI_post_opt1dx_date) &  id_list$DILI_post_optdx_counted<=2))]<-1
+id_list$any_DILI_3opt[is.na(id_list$any_DILI_3opt)]<-0
+
+id_list<- transform(id_list, any_DILI_date_3opt = pmin(DILI_post_iptdx_date,
+                                                  DILI_post_opt1dx_date,
+                                                  ALT_abn_date,
+                                                  ALP_abn_date,
+                                                  INR_abn_date,
+                                                  Tbil_25abn_date,na.rm = TRUE))
+
+id_list$any_DILI_date_3opt[id_list$any_DILI_3opt==0]<-NA
+table(id_list$any_DILI_3opt)
+
+id_list$any_DILI_G1_3opt[ ((!is.na(id_list$ALT_abn_date) |
+                        !is.na(id_list$ALP_abn_date)) &
+                       is.na(id_list$Tbil_25abn_date) &
+                       is.na(id_list$INR_abn_date)) &
+                       id_list$any_DILI_3opt==1 ]<-1
+
+
+id_list$any_DILI_G2_3opt[ ((!is.na(id_list$ALT_abn_date) |
+                        !is.na(id_list$ALP_abn_date)) &
+                       (!is.na(id_list$Tbil_25abn_date) |
+                          !is.na(id_list$INR_abn_date)) ) &
+                       id_list$any_DILI_3opt==1]<-1
+
+id_list$any_DILI_G3_3opt[ ((((!is.na(id_list$ALT_abn_date) |
+                          !is.na(id_list$ALP_abn_date)) &
+                         !is.na(id_list$Tbil_5abn_date)) |
+                        !is.na(id_list$DILI_post_iptdx_date)) &
+                       is.na(id_list$Hepaence_post_dx_date)) &
+                       id_list$any_DILI_3opt==1]<-1
+
+id_list$any_DILI_G4_3opt[(!is.na(id_list$INR_abn_date) &
+                      !is.na(id_list$Tbil_10abn_date)) &
+                      id_list$any_DILI_3opt==1]<-1
+
+table(id_list$any_DILI_G1_3opt)
+table(id_list$any_DILI_G2_3opt)
+table(id_list$any_DILI_G3_3opt)
+table(id_list$any_DILI_G4_3opt)
+
+id_list$any_DILI_2opt[!is.na(id_list$DILI_post_iptdx_date) |
+                        (!is.na(id_list$DILI_post_opt1dx_date) &  id_list$DILI_post_optdx_counted>1) |
+                        ( (!is.na(id_list$ALT_abn_date) |
+                             !is.na(id_list$ALP_abn_date) |
+                             !is.na(id_list$Tbil_25abn_date) |
+                             !is.na(id_list$INR_abn_date) ) & 
+                            !is.na(id_list$DILI_post_opt1dx_date) )]<-1
+id_list$any_DILI_2opt[is.na(id_list$any_DILI_2opt)]<-0
+
+id_list<- transform(id_list, any_DILI_date_2opt = pmin(DILI_post_iptdx_date,
+                                                       DILI_post_opt1dx_date,
+                                                       ALT_abn_date,
+                                                       ALP_abn_date,
+                                                       INR_abn_date,
+                                                       Tbil_25abn_date,na.rm = TRUE))
+
+id_list$any_DILI_date_2opt[id_list$any_DILI_2opt==0]<-NA
+table(id_list$any_DILI_2opt)
+
+id_list$any_DILI_all_lab[!is.na(id_list$DILI_post_iptdx_date) |
+                           (!is.na(id_list$DILI_post_opt1dx_date) &  id_list$DILI_post_optdx_counted>1) |
+                            (!is.na(id_list$ALT_abn_date) |
+                                !is.na(id_list$ALP_abn_date) |
+                                !is.na(id_list$Tbil_25abn_date) |
+                                !is.na(id_list$INR_abn_date) )]<-1
+id_list$any_DILI_all_lab[is.na(id_list$any_DILI_all_lab)]<-0
+
+id_list<- transform(id_list, any_DILI_date_all_lab = pmin(DILI_post_iptdx_date,
+                                                          DILI_post_opt1dx_date,
+                                                          ALT_abn_date,
+                                                          ALP_abn_date,
+                                                          INR_abn_date,
+                                                          Tbil_25abn_date,na.rm = TRUE))
+
+id_list$any_DILI_date_all_lab[id_list$any_DILI_all_lab==0]<-NA
+table(id_list$any_DILI_all_lab)
+
+table(id_list$Outcome_type)
+write.csv(id_list,"id_list_1015.csv")
+
+write_excel_csv(id_list,"id_list_1015.csv")
