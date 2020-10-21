@@ -1,0 +1,135 @@
+library(questionr)
+
+#Read Hx file
+setwd("E:/Ningbo Projects/TB/TB project/Raw data/Hx/")
+ldf <- list() # creates a list
+listxlsx <- dir(pattern = "*.xlsx") # creates the list of all the xlsx files in the directory
+Hx <- ldply(listxlsx, read_xlsx)
+
+Hx_HTA<-filter(Hx, grepl("高血压",Hx))
+summary_Hx_HTA<-Hx_HTA %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Hx), min, na.rm = TRUE)
+summary_Hx_HTA$Hx_HTA<-1
+#Join HTA to id_list
+id_list1 <- left_join(id_list, summary_Hx_HTA, by = "idcard") 
+
+Hx_case<-filter(Hx, grepl("糖尿病",Hx))
+summary_case<-Hx_case %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Hx), min, na.rm = TRUE)
+summary_case$Hx_Diabetes<-1
+id_list2 <- left_join(id_list1, summary_case, by = "idcard") 
+
+Hx_case<-filter(Hx, grepl("糖尿病",Hx))
+summary_case<-Hx_case %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Hx), min, na.rm = TRUE)
+summary_case$Hx_Diabetes<-1
+id_list2 <- left_join(id_list1, summary_case, by = "idcard") 
+
+Hx_case<-filter(Hx, grepl("慢性阻塞性肺",Hx) | grepl("哮喘",Hx) | grepl("慢性支气管炎",Hx))
+summary_case<-Hx_case %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Hx), min, na.rm = TRUE)
+summary_case$Hx_COPD<-1
+id_list3 <- left_join(id_list2, summary_case, by = "idcard") 
+
+Hx_case<-filter(Hx, grepl("结核",Hx))
+summary_case<-Hx_case %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Hx), min, na.rm = TRUE)
+summary_case$Hx_TB<-1
+id_list4 <- left_join(id_list3, summary_case, by = "idcard") 
+
+Hx_case<-filter(Hx, grepl("胆固醇",Hx)| grepl("血脂",Hx) | grepl("甘油三酯",Hx)| grepl("脂蛋白增高",Hx) | grepl("脂蛋白偏高",Hx))
+summary_case<-Hx_case %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Hx), min, na.rm = TRUE)
+summary_case$Hx_Dyslipidemia<-1
+id_list5 <- left_join(id_list4, summary_case, by = "idcard") 
+
+Hx_case<-filter(Hx, (grepl("肿瘤",Hx) | grepl("癌",Hx)| grepl("CA",Hx)) & !grepl("癌胚抗原",Hx))
+summary_case<-Hx_case %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Hx), min, na.rm = TRUE)
+summary_case$Hx_Cancer<-1
+id_list6 <- left_join(id_list5, summary_case, by = "idcard") 
+
+Hx_case<-filter(Hx, grepl("冠状动脉",Hx)| grepl("冠心病",Hx) | grepl("心血管",Hx)| 
+                  grepl("心脑血管",Hx) | grepl("心脏病",Hx)| grepl("心肌缺血",Hx)|
+                  grepl("脑卒中",Hx) | grepl("中风",Hx)| grepl("脑血管",Hx)|
+                  grepl("脑出血",Hx) | grepl("脑动脉",Hx)| grepl("脑梗",Hx)|
+                  grepl("脑血栓",Hx) | grepl("脑溢血",Hx))
+
+summary_case<-Hx_case %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Hx), min, na.rm = TRUE)
+summary_case$Hx_CVD<-1
+id_list7 <- left_join(id_list6, summary_case, by = "idcard") 
+
+Hx_case<-filter(Hx, grepl("乙肝",Hx)| grepl("乙型病毒性肝炎",Hx))
+
+summary_case<-Hx_case %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Hx), min, na.rm = TRUE)
+summary_case$Hx_HBV<-1
+id_list8 <- left_join(id_list7, summary_case, by = "idcard") 
+
+Hx_case<-filter(Hx, grepl("肝囊肿",Hx)| grepl("肝炎",Hx)| grepl("肝硬化",Hx)| grepl("脂肪肝",Hx)| grepl("甲肝",Hx))
+summary_case<-Hx_case %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Hx), min, na.rm = TRUE)
+summary_case$Hx_liver<-1
+id_list8 <- left_join(id_list7, summary_case, by = "idcard") 
+
+#remove colums not wanted
+id_list9<-id_list8 %>% select(-contains('Hx.'))
+#smoking status
+summary_case<-Hx %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Smoking), min, na.rm = TRUE)
+
+summary_case$Smoking[summary_case$Smoking=="不吸烟"]<-"No_smoker"
+summary_case$Smoking[summary_case$Smoking=="吸烟"]<-"Smoker"
+summary_case$Smoking[summary_case$Smoking=="已戒烟"]<-"Former_smoker"
+summary_case$Smoking[grepl("是的", summary_case$Smoking, fixed=TRUE)]<-"Smoker"
+
+
+id_list1 <- left_join(id_list9, summary_case, by = "idcard") 
+
+#Alcohol status
+summary_case<-Hx %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Alcohol), min, na.rm = TRUE)
+
+summary_case$Alcohol[summary_case$Alcohol=="从不"]<-"Never"
+summary_case$Alcohol[summary_case$Alcohol=="从不喝"]<-"Never"
+summary_case$Alcohol[summary_case$Alcohol=="偶尔" |summary_case$Alcohol=="少于1天/月" |summary_case$Alcohol=="每天" |summary_case$Alcohol=="经常" |
+                       summary_case$Alcohol=="1-3天/月" ]<-"Drinker"
+
+
+id_list2 <- left_join(id_list1, summary_case, by = "idcard") 
+
+#Pregnancy status
+summary_case<-Hx %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Pregnancy), min, na.rm = TRUE)
+
+summary_case$Pregnancy[summary_case$Pregnancy=="是"]<-1
+summary_case$Pregnancy[summary_case$Pregnancy=="否"]<-0
+
+id_list3 <- left_join(id_list2, summary_case, by = "idcard") 
+
+write.xlsx(id_list3, file = "id_list_1010.xlsx", sheetName = "id_list")
+x<-Freq(summary_case$Alcohol)
+x<-Freq(Hx$Pregnancy)
+write.xlsx(x, file = "temp.xlsx", sheetName = "temp")
+
+
+
+
+
+
+
+
