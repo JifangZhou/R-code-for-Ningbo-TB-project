@@ -1,0 +1,58 @@
+id_list<-read_xlsx("C:/Users/frick/OneDrive/Documents/yang Tianci article on TB/Raw data/Demo/Demographics.xlsx")
+as.Date(id_list$Dob, "%Y/%m/%d")
+
+library(lubridate)
+id_list$Dob_new <- ymd(id_list$Dob)
+id_list$Yob<-year(id_list$Dob_new)
+x<-Freq(id_list$Yob)
+
+x<-Freq(id_list$Sex)
+x<-Freq(id_list$Educ)
+x<-Freq(id_list$Marital)
+x<-Freq(id_list$Race)
+
+#Merge the lab_abnormal cases to id_list
+id_list2 <- left_join(id_list, summary_lab2, by = "idcard") 
+id_list3 <- left_join(id_list2, summary_lab5, by = "idcard") 
+id_list3$DILI_Lab_2[is.na(id_list3$DILI_Lab_2)] <- 0
+id_list3$DILI_Lab_5[is.na(id_list3$DILI_Lab_5)] <- 0
+
+id_list3$Yob_cat[id_list3$Yob<=1925] <- 0
+id_list3$Yob_cat[id_list3$Yob<=1950 & id_list3$Yob>1925] <- 1
+id_list3$Yob_cat[id_list3$Yob<=1975 & id_list3$Yob>1950] <- 2
+id_list3$Yob_cat[id_list3$Yob<=2000 & id_list3$Yob>1975] <- 3
+id_list3$Yob_cat[id_list3$Yob>2000] <- 4
+
+
+id_list3$Sex[id_list3$Sex=="男"] <- 1
+id_list3$Sex[id_list3$Sex=="女"] <- 0
+id_list3$Sex[id_list3$Sex=="未知"] <- 99
+
+id_list3$Educ[id_list3$Educ=="文盲或半文盲"] <- 0
+id_list3$Educ[id_list3$Educ=="小学"] <- 1
+id_list3$Educ[id_list3$Educ=="初中"] <- 2
+id_list3$Educ[id_list3$Educ=="中等专业学校"] <-2
+id_list3$Educ[id_list3$Educ=="技工学校"] <- 3
+id_list3$Educ[id_list3$Educ=="高中"] <- 3
+id_list3$Educ[id_list3$Educ=="大学专科和专科学校"] <- 4
+id_list3$Educ[id_list3$Educ=="大学本科"] <- 4
+id_list3$Educ[id_list3$Educ=="研究生"] <- 5
+id_list3$Educ[id_list3$Educ=="不详"] <- 99
+
+
+id_list3$Marital[id_list3$Marital=="未婚"] <- 0
+id_list3$Marital[id_list3$Marital=="已婚"] <- 1
+id_list3$Marital[id_list3$Marital=="丧偶"] <- 2
+id_list3$Marital[id_list3$Marital=="再婚"] <- 3
+id_list3$Marital[id_list3$Marital=="离婚"] <- 4
+id_list3$Marital[id_list3$Marital=="未说明的婚姻状况"] <- 99
+
+
+am.data = glm(formula = DILI_Lab_2 ~ as.factor(Yob_cat) + Sex + as.factor(Educ) + as.factor(Marital) +as.factor(Race), data = id_list3, family = binomial)
+summary(am.data)
+exp(am.data$coefficients)
+
+am.data = glm(formula = DILI_Lab_5 ~ as.factor(Yob_cat) + Sex + as.factor(Educ) + as.factor(Marital) +as.factor(Race), data = id_list3, family = binomial)
+
+exp(am.data$coefficients)
+
