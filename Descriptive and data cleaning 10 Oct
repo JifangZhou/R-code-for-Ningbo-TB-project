@@ -1,0 +1,72 @@
+library(tidyverse)
+library(readxl)
+library(dplyr)
+library(lubridate)
+library(doBy)
+library(plyr)
+library(readr)     
+library(frequency)   
+library(DescTools)
+library(purrr)
+library(rJava)
+library(xlsx)
+
+#Load files in CSV format and clean
+setwd("E:/Ningbo Projects/TB/TB project/Workingd/CSV files/")
+id_list<-read_csv("id_list.csv")
+id_list$Dob<-as.Date(id_list$Dob)
+
+id_list$Sex[id_list$Sex=="男"]<-1
+id_list$Sex[id_list$Sex=="女"]<-2
+id_list$Sex[id_list$Sex=="未知"]<-99
+
+id_list$Educ[id_list$Educ=="文盲或半文盲"]<-1
+id_list$Educ[id_list$Educ=="小学"]<-2
+id_list$Educ[id_list$Educ=="初中"]<-3
+id_list$Educ[id_list$Educ=="高中"]<-4
+id_list$Educ[id_list$Educ=="中等专业学校"]<-4
+id_list$Educ[id_list$Educ=="技工学校"]<-4
+id_list$Educ[id_list$Educ=="大学专科和专科学校"]<-5
+id_list$Educ[id_list$Educ=="大学本科"]<-5
+id_list$Educ[id_list$Educ=="研究生"]<-5
+id_list$Educ[id_list$Educ=="不详"]<-99
+
+id_list$Marital[id_list$Marital=="已婚"]<-1
+id_list$Marital[id_list$Marital=="未婚"]<-2
+id_list$Marital[id_list$Marital=="丧偶"]<-3
+id_list$Marital[id_list$Marital=="离婚"]<-4
+id_list$Marital[id_list$Marital=="再婚"]<-5
+id_list$Marital[id_list$Marital=="未说明的婚姻状况"]<-99
+
+id_list$Profession[id_list$Profession=="农、林、牧、渔、水利业生产人员"]<-"Agriculture"
+id_list$Profession[id_list$Profession=="农民"]<-"Agriculture"
+id_list$Profession[id_list$Profession=="办事人员和有关人员"]<-"Government"
+id_list$Profession[id_list$Profession=="国家机关、党群组织、企业、事业单位负责人"]<-"Government"
+id_list$Profession[id_list$Profession=="其他办事人员和有关人员"]<-"Government"
+id_list$Profession[id_list$Profession=="干部职员"]<-"Government"
+id_list$Profession[id_list$Profession=="生产、运输设备操作人员及有关人员"]<-"Manufacture"
+id_list$Profession[id_list$Profession=="工人"]<-"Manufacture"
+id_list$Profession[id_list$Profession=="民工"]<-"Manufacture"
+id_list$Profession[id_list$Profession=="军人"]<-"Military"	
+id_list$Profession[id_list$Profession=="离退人员"]<-"Retired"
+id_list$Profession[id_list$Profession=="个体"]<-"Self_employed"
+id_list$Profession[id_list$Profession=="自由职业"]<-"Self_employed"
+id_list$Profession[id_list$Profession=="商业、服务业人员"]<-"Service"
+id_list$Profession[id_list$Profession=="商业服务"]<-"Service"
+id_list$Profession[id_list$Profession=="其他商业、服务业人员"]<-"Service"  
+id_list$Profession[id_list$Profession=="保安"]<-"Service"
+id_list$Profession[id_list$Profession=="专业技术人员"]<-"Specialist"
+id_list$Profession[id_list$Profession=="学生"]<-"Student"
+id_list$Profession[id_list$Profession=="无职业"]<-"Unemployed"
+id_list$Profession[id_list$Profession=="家务"]<-"Unemployed"
+id_list$Profession[id_list$Profession=="家务及待业"]<-"Unemployed"
+id_list$Profession[id_list$Profession=="不详"]<-"Unknown"
+id_list$Profession[id_list$Profession=="不便分类的其他从业人员"]<-"Unclassified"	
+id_list$Profession[id_list$Profession=="其他"]<- "Other"
+
+id_list$Race[id_list$Race!="汉族"]<- "Other"
+id_list$Race[id_list$Race=="汉族"]<-"Han"	
+
+
+x<-Freq(id_list$Race, ord = "desc")
+write.xlsx(x, file = "temp.xlsx", sheetName = "temp")
