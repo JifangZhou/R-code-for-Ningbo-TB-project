@@ -1,0 +1,87 @@
+library(tidyverse)
+library(readxl)
+library(dplyr)
+library(lubridate)
+library(doBy)
+library(plyr)
+library(readr)     
+library(frequency)   
+library(DescTools)
+library(purrr)
+library(rJava)
+library(xlsx)
+
+
+# TB case from OPT Pharm
+setwd("E:/Ningbo Projects/TB/TB project/Raw data/OPT_pharm/")
+ldf <- list() # creates a list
+listxlsx <- dir(pattern = "*.xlsx") # creates the list of all the xlsx files in the directory
+OPT_pharm <- ldply(listxlsx, read_xlsx)
+
+TB_OPT_pharm<-filter(OPT_pharm, grepl("结核",disease_name))
+TB_OPT_pharm$TB_time<-TB_OPT_pharm$clinic_time
+
+#TB case from OPT file
+setwd("E:/Ningbo Projects/TB/TB project/Raw data/OPT/")
+ldf <- list() # creates a list
+listxlsx <- dir(pattern = "*.xlsx") # creates the list of all the xlsx files in the directory
+OPT<- ldply(listxlsx, read_xlsx)
+
+TB_OPT<-filter(OPT, grepl("结核",disease_name))
+TB_OPT$TB_time<-TB_OPT$clinic_time
+
+#IPT_pharm cleaning
+
+setwd("E:/Ningbo Projects/TB/TB project/Raw data/IPT_pharm/")
+ldf <- list() # creates a list
+listxlsx <- dir(pattern = "*.xlsx") # creates the list of all the csv files in the directory
+IPT_pharm <- ldply(listxlsx, read_xlsx)
+
+
+#TB case from IPT file
+setwd("E:/Ningbo Projects/TB/TB project/Raw data/IPT/")
+ldf <- list() # creates a list
+listxlsx <- dir(pattern = "*.xlsx") # creates the list of all the xlsx files in the directory
+IPT<- ldply(listxlsx, read_xlsx)
+
+TB_IPT<-filter(IPT, grepl("结核",disease_name))
+TB_IPT$TB_time<-TB_IPT$dis_time
+
+#Lab results cleaning
+setwd("E:/Ningbo Projects/TB/TB project/Raw data/Raw data/Lab/")
+ldf <- list() # creates a list
+listxlsx <- dir(pattern = "*.xlsx") # creates the list of all the csv files in the directory
+Lab <- ldply(listxlsx, read_xlsx)
+Lab$result_num<-as.numeric(Lab$result)
+
+#Merge all files on TB diagnosis
+TB_all<-gtools::smartbind(TB_OPT_pharm,TB_OPT,TB_IPT)
+
+summary_TB<-TB_all %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(TB_time), min, na.rm = TRUE)
+
+#liver injury by diagnosis codes
+Case_OPT_pharm<-filter(OPT_pharm, grepl("肝",disease_name))
+Case_OPT_pharm$Case_time<-Case_OPT_pharm$clinic_time
+
+Case_OPT<-filter(OPT, grepl("肝",disease_name))
+Case_OPT$Case_time<-Case_OPT$clinic_time
+
+Case_IPT<-filter(IPT, grepl("肝",disease_name))
+Case_OPT$Case_time<-Case_OPT$clinic_time
+
+Case_all<-gtools::smartbind(Case_OPT_pharm,Case_OPT,Case_IPT)
+#export files
+setwd("E:/Ningbo Projects/TB/TB project/Workingd/")
+write_xlsx(Case_all, file = "liver_dx.xlsx", sheetName = "Liver_Dx_file")
+write_xlsx(TB_all, file = "TB_dx.xlsx", sheetName = "TB_Dx_file")
+write.xlsx(IPT, file = "IPT.xlsx", sheetName = "IPT_file")
+write_xlsx(OPT, file = "OPT.xlsx", sheetName = "OPT_file")
+write_xlsx(IPT_pharm, file = "IPT_pharm.xlsx", sheetName = "IPT_pharm_file")
+write_xlsx(OPT_pharm, file = "OPT_pharm.xlsx", sheetName = "OPT_pharm_file")
+
+write_xlsx(Lab, file = "Lab.xlsx", sheetName = "Lab_file")
+
+DILI_all<-filter(Case_all, grepl("药物性",disease_name))
+DILI_all<-filter(Case_all, grepl("",disease_name))
