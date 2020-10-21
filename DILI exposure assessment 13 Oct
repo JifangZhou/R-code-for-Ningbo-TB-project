@@ -1,0 +1,131 @@
+#Assessment of exposure for DILI
+#Load IPT OPT and Pharm files
+setwd("E:/Ningbo Projects/TB/TB project/Workingd/CSV files/")
+
+IPT<-read_csv("IPT.csv")
+OPT<-read_csv("OPT.csv")
+IPT_pharm<-read_csv("IPT_pharm.csv")
+OPT_pharm<-read_csv("OPT_pharm.csv")
+Lab1<-read_csv("Lab1.csv")
+Lab2<-read_csv("Lab2.csv")
+
+
+#extract all DILI diagnosis
+#liver injury by diagnosis codes
+Case_OPT_pharm<-filter(OPT_pharm, grepl("药物性肝",disease_name))
+Case_OPT_pharm$Case_time<-Case_OPT_pharm$clinic_time
+
+Case_OPT<-filter(OPT, grepl("药物性肝",disease_name))
+Case_OPT$Case_time<-Case_OPT$clinic_time
+
+Case_IPT<-filter(IPT, grepl("药物性肝",disease_name))
+Case_IPT$Case_time<-Case_IPT$dis_time
+
+Case_OPT_pharm <- Case_OPT_pharm %>% select(idcard, dt_name, Case_time)
+Case_OPT <- Case_OPT %>% select(idcard, dt_name, Case_time)
+Case_IPT <- Case_IPT %>% select(idcard, dt_name, Case_time)
+
+Case_all<-rbind(Case_OPT_pharm,Case_OPT,Case_IPT)
+
+#Merge with primary id_list on IPT Dx for DILI
+id_list<-read_xlsx("E:/Ningbo Projects/TB/TB project/Workingd/CSV files/id_list_1013.xlsx")
+
+Case_IPT_index <- inner_join(Case_IPT,id_list, by = "idcard") 
+Case_IPT_index$Dx_date<- as.Date(Case_IPT_index$Dx_date)
+Case_IPT_index$Rx_end_date<- as.Date(Case_IPT_index$Rx_end_date)
+
+Case_pre_index<-Case_IPT_index [Case_IPT_index$Case_time<Case_IPT_index$Dx_date,]
+Case_post_index<-Case_IPT_index [Case_IPT_index$Case_time>=Case_IPT_index$Dx_date & Case_IPT_index$Case_time<=Case_IPT_index$Rx_end_date,]
+
+#extract DILI dates by IPT diagnosis
+
+summary_Case_pre<-Case_pre_index %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Case_time), min, na.rm = TRUE)
+summary_Case_post<-Case_post_index %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Case_time), min, na.rm = TRUE)
+
+colnames(summary_Case_pre)[colnames(summary_Case_pre) %in% c("Case_time")] <- c("DILI_pre_iptdx_date")
+colnames(summary_Case_post)[colnames(summary_Case_post) %in% c("Case_time")] <- c("DILI_post_iptdx_date")
+
+id_list1 <- left_join(id_list,  summary_Case_pre,  by = "idcard") 
+id_list2 <- left_join(id_list1, summary_Case_post, by = "idcard") 
+
+#Extract DILI opt diagnosis with at least twice occurrence iregardless of IPT DILI dx
+
+Case_all<-rbind(Case_OPT_pharm,Case_OPT)
+
+Case_all_index <- inner_join(Case_all,id_list, by = "idcard") 
+Case_all_index$Dx_date<- as.Date(Case_all_index$Dx_date)
+Case_all_index$Rx_end_date<- as.Date(Case_all_index$Rx_end_date)
+
+Case_pre_index<-Case_all_index [Case_all_index$Case_time<Case_all_index$Dx_date,]
+Case_post_index<-Case_all_index [Case_all_index$Case_time>=Case_all_index$Dx_date & Case_all_index$Case_time<=Case_all_index$Rx_end_date,]
+
+Case_pre_index$count<-1
+Case_post_index$count<-1
+#extract DILI dates by diagnosis
+
+summary_Case_pre<-Case_pre_index %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Case_time), min, na.rm = TRUE)
+summary_Case_post<-Case_post_index %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Case_time), min, na.rm = TRUE)
+
+colnames(summary_Case_pre)[colnames(summary_Case_pre) %in% c("Case_time")] <- c("DILI_pre_opt1dx_date")
+colnames(summary_Case_post)[colnames(summary_Case_post) %in% c("Case_time")] <- c("DILI_post_opt1dx_date")
+
+id_list3 <- left_join(id_list2,  summary_Case_pre,  by = "idcard") 
+id_list4 <- left_join(id_list3, summary_Case_post, by = "idcard") 
+
+#OPT DILI occurrence times
+Case_pre_index$counted<-1
+Case_post_index$counted<-1
+#extract DILI dates by diagnosis
+
+summary_Case_pre<-Case_pre_index %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars( counted),sum,na.rm = TRUE)
+summary_Case_post<-Case_post_index %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars( counted),sum, na.rm = TRUE)
+
+colnames(summary_Case_pre)[colnames(summary_Case_pre) %in% c("counted")] <- c("DILI_pre_optdx_counted")
+colnames(summary_Case_post)[colnames(summary_Case_post) %in% c("counted")] <- c("DILI_post_optdx_counted")
+
+id_list5 <- left_join(id_list4,  summary_Case_pre,  by = "idcard") 
+id_list6 <- left_join(id_list5, summary_Case_post, by = "idcard") 
+
+
+#liver injury by lab findings
+#https://link.springer.com/article/10.1007/s12072-017-9793-2
+#Grade 0 (no liver injury): Patients tolerate drug treatment and have no hepatotoxic reactions.
+#Grade 1 (mild liver injury): Elevations in serum ALT and/or ALP levels, TBil <2.5 ULN (2.5 mg/dL or 42.75 μmol/L), INR <1.5. Most patients show adaptability to the liver injury. Patients may present with or without symptoms such as fatigue, asthenia, nausea, anorexia, right upper abdominal pain, jaundice, pruritus, rashes, or weight loss [3, 117].
+#Grade 2 (moderate liver injury): Elevated serum ALT and/or ALP, with TBil ≥2.5 ULN or INR ≥1.5. The above mentioned symptoms may become aggravated.
+#Grade 3 (severe liver injury): Elevated serum ALT and/or ALP, TBil ≥5 ULN (5 mg/dL or 85.5 μmol/L) with or without INR ≥1.5. The symptoms are further aggravated, which indicates the need of hospitalization or delayed hospital stay, but there is no evidence of hepatic encephalopathy.
+#Grade 4 (ALF): Evidence of coagulation abnormality indicated by INR ≥1.5 [115, 116] or PTA <40% [115], signs of hepatic encephalopathy, and TBil ≥10 ULN (10 mg/dL or 171 μmol/L) or daily elevation ≥1.0 mg/dL (17.1 μmol/L) [115] in 26 weeks after the DILI onset. Patients may have ascites and DILI-related dysfunction of other organs. If there is evidence of underlying chronic liver diseases, especially liver cirrhosis, the diagnosis of acute-on-chronic liver failure (ACLF) is established.
+#Grade 5 (lethal): Death due to DILI, or need to receive liver transplantation for survival.
+
+
+
+
+
+x<-Freq(Lab1$assay_item_name, ord = "desc")
+
+x<-Freq(Lab1_Tbil$refrange)
+x<-Freq(Lab1_ALP_valid$refrange)
+x<-Freq(Hx$Pregnancy)
+
+write.xlsx(x, file = "temp.xlsx", sheetName = "temp")
+
+ALT <- filter(Lab,assay_item_name=="????????????????????????")
+AST <- filter(Lab,assay_item_name=="??????????????????????????????")
+INR <- filter(Lab,assay_item_name=="?????????????????????")
+Tbil <- filter(Lab,assay_item_name=="????????????")
+
+
+
+Case_all<-gtools::smartbind(Case_OPT_pharm,Case_OPT,Case_IPT)
+
