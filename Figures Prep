@@ -1,0 +1,25 @@
+library(ggplot2)
+
+theme_set(
+  theme_classic() + 
+    theme(legend.position = "top"))
+
+
+ggplot(figure_hospitals, aes(x = Hepato, y = TCM)) + 
+  geom_point(aes(color = Tier, size = Count), alpha = 0.5) +
+  scale_color_manual(values = c("#00AFBB", "#E7B800", "#FC4E07","dark red")) +
+  scale_size(range = c(0.5, 12)) +
+  geom_hline(yintercept=0, linetype="dashed", color = "black")+
+  geom_vline(xintercept=0, linetype="dashed", color = "black")
+
+ggplot(Drug_inappropriate, aes(x = year, y = sum_drug_fee, fill = Cat)) +
+  geom_area(alpha = .9)
+
+ggplot(Drug_inappropriate, aes(x = year, y = Relative, shape = Cat)) +
+  geom_line(aes(color = Cat))  +
+  scale_color_manual(values = c("dark red", "blue","#00AFBB", "#E7B800"))+
+  geom_point(size = 4)+ expand_limits (y = 0)
+
+ggplot(Drug_inappropriate, aes(x=year, y = Value, group=Cat, fill=Cat))+
+  geom_bar(stat="identity", position="dodge")+scale_fill_manual(values=c("#6495ED","#FFA500","#228B22","#FF4500"))
+
