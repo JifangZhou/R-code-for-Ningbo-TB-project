@@ -1,0 +1,65 @@
+#Drug utilization assessment
+library(tidyverse)
+library(readxl)
+library(dplyr)
+library(lubridate)
+library(doBy)
+library(plyr)
+library(readr)     
+library(frequency)   
+library(DescTools)
+library(purrr)
+library(rJava)
+library(xlsx)
+library(dostats)
+
+setwd("E:/Ningbo Projects/TB/TB project/Workingd/CSV files/")
+Sys.setlocale(category = "LC_ALL",local="chinese")
+IPT<-read_csv("IPT_TB_1021.csv")
+OPT<-read_csv("OPT_TB_1021.csv")
+id_list<-read_csv("id_list_1021morning.csv")
+IPT_pharm<-read_csv("IPT_pharm.csv")
+OPT_pharm<-read_csv("OPT_pharm.csv")
+
+#load all drug list files
+IPT_pharm_list<-read_xlsx("iptdrugbook.xlsx")
+OPT_pharm_list<-read_xlsx("optdrugbook.xlsx")
+
+IPT_pharm_list$Cat[IPT_pharm_list$Cat=="TCM" & grepl("注射",IPT_pharm_list$level)]<-"TCM_inj"
+OPT_pharm_list$Cat[OPT_pharm_list$Cat=="TCM" & grepl("注射",OPT_pharm_list$level)]<-"TCM_inj"
+
+#Merge drug types to the OPT and IPT pharm lists;
+IPT_pharm_index<- inner_join(IPT_pharm ,IPT_pharm_list, by = c("item_name" = "level"))
+OPT_pharm_index<- inner_join(OPT_pharm ,OPT_pharm_list, by = c("item_name" = "level"))
+OPT_pharm_index$Cat[OPT_pharm_index$Cat=="TB"]<-"anti_tuberculosis"
+table(OPT_pharm_index$Cat)
+write_excel_csv(IPT_pharm_index,"IPT_pharm_1021.csv")
+write_excel_csv(OPT_pharm_index,"OPT_pharm_1021.csv")
+
+#prepare for GEE file in ipt assessment
+IPT_outcome<-read_csv("ipt_outcome.csv")
+IPT_all<- inner_join(IPT ,IPT_outcome, by = c("idcard" = "idcard","adm_time" = "adm_time" ))
+library(gee)
+
+summary(gee(N_Hepato ~ as.factor(tier), id=idcard, data=IPT_all, family = poisson, corstr="exchangeable"))
+
+OPT_outcome<-read_csv("opt_outcome.csv")
+OPT_all<- inner_join(OPT ,OPT_outcome, by = c("idcard" = "idcard","clinic_time" = "clinic_time" ))
+library(geepack)
+OPT_all_temp<-OPT_all[OPT_all$tier=="tier_3" & !OPT_all$org_name=="慈溪市妇幼保健院" & !OPT_all$org_name=="慈溪市人民医院" &
+                       !OPT_all$org_name=="宁海县妇幼保健院" & !OPT_all$org_name=="宁波市精神病院",]
+
+id_list_index<-id_list %>% select(idcard, Sex,age)
+IPT_all<- inner_join(IPT_all ,id_list_index, by = c("idcard" = "idcard" ))
+OPT_all<- inner_join(OPT_all ,id_list_index, by = c("idcard" = "idcard" ))
+
+write_excel_csv(IPT_all,"IPT_analytical_1022.csv")
+write_excel_csv(OPT_all,"OPT_analytical_1022.csv")
+
+table(IPT_all$org_name)
+IPT_temp<-IPT_all[ IPT_all$org_name=="鄞州二院" 
+                  | IPT_all$org_name=="宁波市第一医院" | IPT_all$org_name=="宁波市第九医院" 
+                  | IPT_all$org_name=="宁波市北仑区人民医院", ]
+mf <- formula(N_Hepato ~ as.factor(org_name))
+gee1 <- geeglm(mf, data=IPT_temp, id=idcard, family=poisson, corstr="exchangeable")
+gee1
