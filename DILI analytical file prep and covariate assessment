@@ -1,0 +1,152 @@
+library(tidyverse)
+library(readxl)
+library(dplyr)
+library(lubridate)
+library(doBy)
+library(plyr)
+library(readr)     
+library(frequency)   
+library(DescTools)
+library(purrr)
+library(rJava)
+library(xlsx)
+library(dostats)
+
+setwd("E:/Ningbo Projects/TB/TB project/Workingd/CSV files/")
+Sys.setlocale(category = "LC_ALL",local="chinese")
+IPT<-read_csv("IPT.csv")
+OPT<-read_csv("OPT.csv")
+id_list<-read_csv("id_list_1021morning.csv")
+IPT_pharm<-read_csv("IPT_pharm.csv")
+OPT_pharm<-read_csv("OPT_pharm.csv")
+
+
+#Assessment of at least two encounters that are 180 days apart in the year before TB Dx
+id_list_index<-id_list %>% select(idcard, Dx_date, Rx_end_date)
+
+IPT_index <- inner_join(IPT,id_list_index, by = "idcard") 
+IPT_pre_index<-IPT_index [IPT_index$adm_time<IPT_index$Dx_date & IPT_index$adm_time>=IPT_index$Dx_date-3650,]
+OPT_index <- inner_join(OPT,id_list_index, by = "idcard") 
+OPT_pre_index<-OPT_index [OPT_index$clinic_time<IPT_index$Dx_date & OPT_index$clinic_time>=OPT_index$Dx_date-3650,]
+
+summary_ipt_dt_min<-IPT_pre_index %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(adm_time), min, na.rm = TRUE)
+summary_ipt_dt_max<-IPT_pre_index %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(adm_time), max, na.rm = TRUE)
+summary_opt_dt_min<-OPT_pre_index %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(clinic_time), min, na.rm = TRUE)
+summary_opt_dt_max<-OPT_pre_index %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(clinic_time), max, na.rm = TRUE)
+
+colnames(summary_ipt_dt_min)[colnames(summary_ipt_dt_min) %in% c("adm_time")] <- c("clinic_time")
+colnames(summary_ipt_dt_max)[colnames(summary_ipt_dt_max) %in% c("adm_time")] <- c("clinic_time")
+
+summary_dt_all<-rbind(summary_ipt_dt_min,summary_ipt_dt_max,summary_opt_dt_min,summary_opt_dt_max)
+summary_dt_min<-summary_dt_all %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(clinic_time), min, na.rm = TRUE)
+summary_dt_max<-summary_dt_all %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(clinic_time), max, na.rm = TRUE)
+colnames(summary_dt_min)[colnames(summary_dt_min) %in% c("clinic_time")] <- c("min_pre_time")
+colnames(summary_dt_max)[colnames(summary_dt_max) %in% c("clinic_time")] <- c("max_pre_time")
+
+id_list1 <- inner_join(id_list,  summary_dt_min,  by = "idcard") 
+id_list2 <- inner_join(id_list1, summary_dt_max, by = "idcard") 
+
+id_list_eligible<-id_list2[id_list2$max_pre_time-id_list2$min_pre_time>=30,]
+id_list_eligible<-id_list_eligible[id_list_eligible$Rx_date-id_list_eligible$Dx_date<=7,]
+
+#outcome variables re-coded
+table(id_list2$any_DILI_G5_3opt)
+
+id_list2$any_DILI_G3_3opt<-0
+id_list2$any_DILI_G3_3opt[ (((!is.na(id_list2$ALT_abn_date) |
+                                !is.na(id_list2$ALP_abn_date)) &
+                               !is.na(id_list2$Tbil_5abn_date)) &
+                              !is.na(id_list2$DILI_post_iptdx_date))  &
+                            id_list2$any_DILI_3opt==1]<-1
+
+
+id_list2$any_DILI_2opt[(id_list2$any_DILI_date_2opt>id_list2$Rx_end_date |
+                                   id_list2$any_DILI_date_2opt<id_list2$Dx_date) &
+                             id_list2$any_DILI_2opt==1 ]<-0
+
+table(id_list2$any_DILI_2opt)
+id_list2$any_DILI_2opt_nolab<-0
+id_list2$any_DILI_2opt_nolab[ (!is.na(id_list2$DILI_post_opt1dx_date) &  id_list2$DILI_post_optdx_counted>1) &
+                        ( (is.na(id_list2$ALT_abn_date) &
+                             is.na(id_list2$ALP_abn_date) &
+                             is.na(id_list2$Tbil_25abn_date) &
+                             is.na(id_list2$INR_abn_date) ) ) &
+                        is.na(id_list2$DILI_post_iptdx_date)]<-1
+id_list2$any_DILI_2opt_nolab[is.na(id_list2$any_DILI_2opt_nolab)]<-0
+table(id_list2$any_DILI_2opt_nolab)
+
+id_list2$any_DILI_G1_3opt[is.na(id_list2$any_DILI_G1_3opt)]<-0
+id_list2$any_DILI_G2_3opt[is.na(id_list2$any_DILI_G2_3opt)]<-0
+
+id_list2$any_DILI_G4_3opt[id_list2$any_DILI_G4_3opt==TRUE]<-1
+id_list2$any_DILI_G4_3opt[is.na(id_list2$any_DILI_G4_3opt)]<-0
+id_list2$any_DILI_G5_3opt<-0
+id_list2$any_DILI_G5_3opt[id_list2$idcard=="99e86d3065db6130142c239655e46852"]<-1
+
+
+id_list_eligible<-id_list2[id_list2$max_pre_time-id_list2$min_pre_time>=30,]
+id_list_eligible<-id_list_eligible[id_list_eligible$Rx_date-id_list_eligible$Dx_date<=7,]
+
+table(id_list_eligible$any_DILI_G1_3opt)
+table(id_list_eligible$any_DILI_G2_3opt)
+table(id_list_eligible$any_DILI_G3_3opt)
+table(id_list_eligible$any_DILI_G4_3opt)
+table(id_list_eligible$any_DILI_G5_3opt)
+table(id_list_eligible$any_DILI_2opt_nolab)
+table(id_list_eligible$any_DILI_2opt)
+
+id_list_eligible<-id_list_eligible[!is.na(id_list_eligible$idcard),]
+
+id_list_eligible$Sex_outcome_list[id_list_eligible$Sex_outcome_list=="男"]<-1
+id_list_eligible$Sex_outcome_list[id_list_eligible$Sex_outcome_list=="女"]<-2
+write_excel_csv(id_list_eligible,"id_list_1113.csv")
+
+id_list_eligible$length<-id_list_eligible$any_DILI_date_2opt-id_list_eligible$Dx_date
+
+temp<-id_list_eligible %>% 
+  group_by(any_DILI_G2_3opt)  %>% 
+  summarise_at(vars(length), max, na.rm = TRUE)
+
+temp<-id_list_eligible %>% 
+  group_by(any_DILI_2opt_nolab)  %>% 
+  summarise_at(vars(length), max, na.rm = TRUE)
+
+temp<-id_list_eligible %>% 
+  group_by(any_DILI_2opt)  %>% 
+  summarise_at(vars(length), max, na.rm = TRUE)
+
+print(temp)
+
+summary_ipt_dt_max<-IPT %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(adm_time), max, na.rm = TRUE)
+summary_opt_dt_max<-OPT %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(clinic_time), max, na.rm = TRUE)
+colnames(summary_ipt_dt_max)[colnames(summary_ipt_dt_max) %in% c("adm_time")] <- c("clinic_time")
+
+summary_dt_all<-rbind(summary_ipt_dt_max,summary_opt_dt_max)
+
+summary_dt_max<-summary_dt_all %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(clinic_time), max, na.rm = TRUE)
+
+colnames(summary_dt_max)[colnames(summary_dt_max) %in% c("clinic_time")] <- c("max_post_time")
+
+id_list1115 <- inner_join(id_list_eligible,  summary_dt_max,  by = "idcard") 
+
+write_excel_csv(id_list1115 ,"id_list_1115.csv")
+
+
