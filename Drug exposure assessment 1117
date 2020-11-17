@@ -1,0 +1,84 @@
+library(tidyverse)
+library(readxl)
+library(dplyr)
+library(lubridate)
+library(doBy)
+library(plyr)
+library(readr)     
+library(frequency)   
+library(DescTools)
+library(purrr)
+library(rJava)
+library(xlsx)
+library(dostats)
+setwd("E:/Ningbo Projects/TB/TB project/Workingd/CSV files/")
+Sys.setlocale(category = "LC_ALL",local="chinese")
+id_list<-read_csv("id_list1116.csv")
+IPT_pharm<-read_csv("IPT_pharm.csv")
+OPT_pharm<-read_csv("OPT_pharm.csv")
+
+#Load drug files
+iptdrugbook<-read_xlsx("iptdrugbook.xlsx")
+optdrugbook<-read_xlsx("optdrugbook.xlsx")
+colnames(iptdrugbook)[colnames(iptdrugbook) %in% c("level")] <- c("item_name")
+colnames(optdrugbook)[colnames(optdrugbook) %in% c("level")] <- c("item_name")
+ipt_drug_index<-inner_join(IPT_pharm,iptdrugbook, by = "item_name") 
+opt_drug_index<-inner_join(OPT_pharm,optdrugbook, by = "item_name") 
+
+#Select only exposed in -7 to day 0 period
+id_list_index<-id_list %>% select(idcard, Dx_date)
+id_list_index$Dx_date<-mdy(id_list_index$Dx_date)
+ipt_drug_index<-inner_join(ipt_drug_index,id_list_index, by = "idcard") 
+opt_drug_index<-inner_join(opt_drug_index,id_list_index, by = "idcard") 
+
+ipt_drug_index_baseline_30<-ipt_drug_index[ipt_drug_index$intake_start_time<=ipt_drug_index$Dx_date-30,]
+opt_drug_index_baseline_30<-opt_drug_index[opt_drug_index$clinic_time<=opt_drug_index$Dx_date-30,]
+
+ipt_drug_index_ini_30<-ipt_drug_index[ipt_drug_index$intake_start_time>ipt_drug_index$Dx_date-30 & ipt_drug_index$intake_start_time<=ipt_drug_index$Dx_date,]
+opt_drug_index_ini_30<-opt_drug_index[opt_drug_index$clinic_time>opt_drug_index$Dx_date-30 &opt_drug_index$clinic_time<=opt_drug_index$Dx_date,]
+
+ipt_hepato_baseline_30<-ipt_drug_index_baseline_30[ipt_drug_index_baseline_30$Cat=="Hepato",]
+opt_hepato_baseline_30<-opt_drug_index_baseline_30[opt_drug_index_baseline_30$Cat=="Hepato",]
+
+ipt_hepato_ini_30<-ipt_drug_index_ini_30[ipt_drug_index_ini_30$Cat=="Hepato",]
+opt_hepato_ini_30<-opt_drug_index_ini_30[opt_drug_index_ini_30$Cat=="Hepato",]
+
+#Extract id_list and then merge to main analytic table
+ipt_hepato_baseline_30<-ipt_hepato_baseline_30 %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(intake_start_time), max, na.rm = TRUE)
+opt_hepato_baseline_30<-opt_hepato_baseline_30 %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(clinic_time), max, na.rm = TRUE)
+
+ipt_hepato_ini_30<-ipt_hepato_ini_30 %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(intake_start_time), min, na.rm = TRUE)
+opt_hepato_ini_30<-opt_hepato_ini_30 %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(clinic_time), min, na.rm = TRUE)
+
+colnames(ipt_hepato_baseline_30)[colnames(ipt_hepato_baseline_30) %in% c("intake_start_time")] <- c("Hepato_ipt_baseline_date")
+colnames(opt_hepato_baseline_30)[colnames(opt_hepato_baseline_30) %in% c("clinic_time")] <- c("Hepato_opt_baseline_date")
+colnames(ipt_hepato_ini_30)[colnames(ipt_hepato_ini_30) %in% c("intake_start_time")] <- c("Hepato_ipt_ini_date")
+colnames(opt_hepato_ini_30)[colnames(opt_hepato_ini_30) %in% c("clinic_time")] <- c("Hepato_opt_ini_date")
+
+id_list1 <- left_join(id_list,  ipt_hepato_baseline_30, by = "idcard") 
+id_list2 <- left_join(id_list1, opt_hepato_baseline_30, by = "idcard") 
+id_list3 <- left_join(id_list2, ipt_hepato_ini_30, by = "idcard") 
+id_list4 <- left_join(id_list3, opt_hepato_ini_30, by = "idcard") 
+
+id_list4$baseline_hepato[!is.na(id_list4$Hepato_ipt_baseline_date) | !is.na(id_list4$Hepato_opt_baseline_date)]<-1
+id_list4$baseline_hepato[is.na(id_list4$baseline_hepato)]<-0
+
+id_list4$ini_hepato[!is.na(id_list4$Hepato_ipt_ini_date) | !is.na(id_list4$Hepato_opt_ini_date)]<-1
+id_list4$ini_hepato[is.na(id_list4$ini_hepato)]<-0
+
+write.csv(id_list4,"id_list_1117_original.csv")
+
+
+Surv(id_list4$sputum_time,id_list41$sputum_convert_status)
+
+fit <- survfit(Surv(id_final1$sputum_time,id_final1$sputum_convert_status) ~ class,   
+               data = id_final1) 
+ggsurvplot(fit, data = id_final1,surv.median.line = "hv", conf.int = FALSE,pval = TRUE,palette = "aaas",risk.table = TRUE)
