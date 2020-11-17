@@ -1,0 +1,108 @@
+#bootstrap simulation
+#prepare patient list
+
+setwd("E:/Ningbo Projects/TB/TB project/Workingd/CSV files/")
+Sys.setlocale(category = "LC_ALL",local="chinese")
+IPT<-read_csv("IPT_TB_1021.csv")
+OPT<-read_csv("OPT_TB_1021.csv")
+id_list<-read_csv("id_list_1021morning.csv")
+IPT_pharm<-read_csv("IPT_pharm_1021.csv")
+OPT_pharm<-read_csv("OPT_pharm_1021.csv")
+
+IPT$count<-1
+summary_ID_IPT<-IPT %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(fee1,selffee), mean, na.rm = TRUE)
+
+summary_ID_IPT_n<-IPT %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(count),sum, na.rm = TRUE)
+
+#Assessment of Hepato and TCM drugs in IPT
+IPT_pharm_hepato<-IPT_pharm[IPT_pharm$Cat=="Hepato",]
+
+summary_IPT_pharm_hepato<-IPT_pharm_hepato %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(fee1), sum, na.rm = TRUE)
+IPT_pharm_TCM<-IPT_pharm[IPT_pharm$Cat=="TCM",]
+
+summary_IPT_pharm_TCM<-IPT_pharm_TCM %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(fee1), sum, na.rm = TRUE)
+
+#OPT file summary
+summary_ID_OPT<-OPT %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(fee1,selffee), sum, na.rm = TRUE)
+
+#Assessment of Hepato and TCM drugs in OPT
+OPT_pharm_hepato<-OPT_pharm[OPT_pharm$Cat=="Hepato",]
+
+summary_OPT_pharm_hepato<-OPT_pharm_hepato %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(fee2), sum, na.rm = TRUE)
+OPT_pharm_TCM<-OPT_pharm[OPT_pharm$Cat=="TCM",]
+
+summary_OPT_pharm_TCM<-OPT_pharm_TCM %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(fee2), sum, na.rm = TRUE)
+
+id_list$Hx_liver_dx[!is.na(id_list$HBV_pre_dx_date) |
+                      !is.na(id_list$HbS_report_time) |
+                      id_list$Hx_liver==1 |
+                      !is.na(id_list$DILI_pre_opt1dx_date) |
+                      !is.na(id_list$Ascites_pre_dx_date) |
+                      !is.na(id_list$Hepaence_pre_dx_date) |
+                      !is.na(id_list$DILI_pre_iptdx_date) |
+                      !is.na(id_list$Cirrhosis_pre_dx_date)] <-1
+
+id_list_index<-id_list%>% select(idcard, Hx_liver_dx)
+id_list_index<- left_join(id_list_index ,summary_ID_IPT, by = c("idcard" = "idcard"))
+id_list_index<- left_join(id_list_index ,summary_ID_IPT_n, by = c("idcard" = "idcard"))
+colnames(id_list_index)[colnames(id_list_index) %in% c("fee1", "selffee")] <- c("IPT_avg", "IPT_self_avg")
+id_list_index<- left_join(id_list_index ,summary_ID_OPT, by = c("idcard" = "idcard"))
+colnames(id_list_index)[colnames(id_list_index) %in% c("fee1", "selffee")] <- c("OPT_sum", "OPT_self_sum")
+
+id_list_index<- left_join(id_list_index ,summary_IPT_pharm_hepato, by = c("idcard" = "idcard"))
+colnames(id_list_index)[colnames(id_list_index) %in% c("fee1")] <- "IPT_hepato_sum"
+id_list_index<- left_join(id_list_index ,summary_IPT_pharm_TCM, by = c("idcard" = "idcard"))
+colnames(id_list_index)[colnames(id_list_index) %in% c("fee1")] <- "IPT_TCM_sum"
+
+id_list_index<- left_join(id_list_index ,summary_OPT_pharm_hepato, by = c("idcard" = "idcard"))
+colnames(id_list_index)[colnames(id_list_index) %in% c("fee2")] <- "OPT_hepato_sum"
+id_list_index<- left_join(id_list_index ,summary_OPT_pharm_TCM, by = c("idcard" = "idcard"))
+colnames(id_list_index)[colnames(id_list_index) %in% c("fee2")] <- "IPT_TCM_sum"
+
+id_list_index[is.na(id_list_index)]<-0
+
+
+id_list_index$tot_fee<-id_list_index$IPT_avg*id_list_index$count+id_list_index$OPT_sum
+id_list_index$tot_selffee<-id_list_index$IPT_self_avg*id_list_index$count+id_list_index$OPT_self_sum
+
+##Scenario 1 情景一：控制门诊护肝药使用（限既往肝功能疾病患者）
+id_list_index$tot_fee_S1<-ifelse(id_list_index$Hx_liver_dx==1,id_list_index$tot_fee,id_list_index$tot_fee-id_list_index$OPT_hepato_sum)
+id_list_index$tot_selffee_S1<-ifelse(id_list_index$Hx_liver_dx==1,id_list_index$tot_selffee,id_list_index$tot_selffee
+                                     -id_list_index$OPT_hepato_sum*(id_list_index$OPT_self_sum/id_list_index$OPT_sum))
+  
+##抽取一次形成自助样本，并做差值得到统计量
+ratio1 = mean(sample(id_list_index$tot_fee_S1,10000,replace = TRUE))/mean(sample(id_list_index$tot_fee,10000,replace = TRUE))
+##通过for循环，得到第2到1000次的差值统计量，不断的传入mean1中
+
+for(i in 2:10000){
+  a = mean(sample(id_list_index$tot_fee_S1,10000,replace = TRUE))/mean(sample(id_list_index$tot_fee,10000,replace = TRUE))
+  ratio1 = c(ratio1,a)
+}
+
+ratio1 = mean(sample(id_list_index$tot_selffee_S1,10000,replace = TRUE))/mean(sample(id_list_index$tot_selffee,10000,replace = TRUE))
+##通过for循环，得到第2到1000次的差值统计量，不断的传入mean1中
+
+for(i in 2:10000){
+  a = mean(sample(id_list_index$tot_selffee_S1,10000,replace = TRUE))/mean(sample(id_list_index$tot_selffee,10000,replace = TRUE))
+  ratio1 = c(ratio1,a)
+}
+
+
+quantile(ratio1,0.975)
+quantile(ratio1,0.025)
+id_list_index[]
+write_excel_csv(id_list_index,"Id_list_analysis_boot.csv")
