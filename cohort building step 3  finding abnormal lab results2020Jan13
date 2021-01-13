@@ -1,0 +1,590 @@
+library(tidyverse)
+library(readxl)
+library(dplyr)
+library(lubridate)
+library(doBy)
+library(plyr)
+library(readr)     
+library(frequency)   
+library(DescTools)
+library(purrr)
+Sys.setenv(JAVA_HOME='C:\\Program Files\\Java\\jre1.8.0_261\\jre')
+library(rJava)
+library(xlsx)
+library(lubridate)
+library(dostats)
+
+
+#Lab cleaning and finding valid results in ALT ALP Tbil and INR
+setwd("E:/Ningbo Projects/TB/TB project/Workingd/CSV files/")
+
+IPT<-read_csv("IPT.csv")
+OPT<-read_csv("OPT.csv")
+IPT_pharm<-read_csv("IPT_pharm.csv")
+OPT_pharm<-read_csv("OPT_pharm.csv")
+Lab1<-read_csv("Lab1.csv")
+Lab2<-read_csv("Lab2.csv")
+
+id_list<-read_csv("id_list_0113.csv")
+id_list_index<-id_list %>% select(idcard,  Dx_date, )
+
+#Selection of all lab values post index date
+Lab1 <- inner_join(Lab1,id_list_index,  by = "idcard") 
+Lab1 <- Lab1[Lab1$report_time>=Lab1$Dx_date,]
+
+Lab2 <- inner_join(Lab2,id_list_index,  by = "idcard") 
+Lab2 <- Lab2[Lab2$report_time>=Lab2$Dx_date,]
+
+Lab1_ALT<-Lab1[(Lab1$assay_item_name=="丙氨酸氨基转移酶(ALT)" |
+                 Lab1$assay_item_name=="丙氨酸氨基转氨酶" |
+                 Lab1$assay_item_name=="丙氨酸氨基转移酶(ALT)" |
+                 Lab1$assay_item_name=="谷丙氨酸转移酶" |
+                 Lab1$assay_item_name=="丙氨酸转氨酶(ALT)" |
+                 Lab1$assay_item_name=="丙氨酸转氨酶" |
+                 Lab1$assay_item_name=="丙氨酸氨基转氨酶(急)" |
+                 Lab1$assay_item_name=="血清丙氨酸氨基转移酶" |
+                 Lab1$assay_item_name=="丙氨酸氨基转移酶(ALT)*" |
+                 Lab1$assay_item_name=="丙氨酸转移酶" |
+                 Lab1$assay_item_name=="血清丙氨酸氨基转移酶测定(免)" |
+                 Lab1$assay_item_name=="丙氨酸氨基转移酶（急）" |
+                 Lab1$assay_item_name=="丙氨酸氨基转移酶测定" |
+                 Lab1$assay_item_name=="血清丙氨酸氨基转移酶测定" |
+                 Lab1$assay_item_name=="谷氨酸氨基转移酶" |
+                 Lab1$assay_item_name=="谷氨酸基转移酶" |
+                 Lab1$assay_item_name=="谷丙转氨酶" |
+                 Lab1$assay_item_name=="谷丙转氨酶(急)" |
+                 Lab1$assay_item_name=="谷丙氨酸转移酶" |
+                 Lab1$assay_item_name=="谷丙转氨酶(ALT)" |
+                 Lab1$assay_item_name=="谷丙转氨酶(速率法)" |
+                 Lab1$assay_item_name=="血清谷丙转氨酶" |
+                 Lab1$assay_item_name=="谷丙转氨酶（免费）" |
+                 Lab1$assay_item_name=="谷丙转氨酶（免）" |
+                 Lab1$assay_item_name=="谷丙酸氨基转移酶"),]
+
+Lab1_ALT$refrange_hi[grepl("35", Lab1_ALT$refrange, fixed = TRUE)]<-35
+Lab1_ALT$refrange_hi[grepl("40", Lab1_ALT$refrange, fixed = TRUE)]<-40
+Lab1_ALT$refrange_hi[grepl("44", Lab1_ALT$refrange, fixed = TRUE)]<-44
+Lab1_ALT$refrange_hi[grepl("45", Lab1_ALT$refrange, fixed = TRUE)]<-45
+Lab1_ALT$refrange_hi[grepl("49", Lab1_ALT$refrange, fixed = TRUE)]<-49
+Lab1_ALT$refrange_hi[grepl("50", Lab1_ALT$refrange, fixed = TRUE)]<-50
+Lab1_ALT$refrange_hi[grepl("52", Lab1_ALT$refrange, fixed = TRUE)]<-52
+Lab1_ALT$refrange_hi[grepl("54", Lab1_ALT$refrange, fixed = TRUE)]<-54
+Lab1_ALT$refrange_hi[grepl("55", Lab1_ALT$refrange, fixed = TRUE)]<-55
+Lab1_ALT$refrange_hi[grepl("60", Lab1_ALT$refrange, fixed = TRUE)]<-60
+Lab1_ALT$refrange_hi[grepl("65", Lab1_ALT$refrange, fixed = TRUE)]<-65
+Lab1_ALT$refrange_hi[grepl("72", Lab1_ALT$refrange, fixed = TRUE)]<-72
+
+Lab1_ALT$result<-as.numeric(Lab1_ALT$result)
+
+Lab1_ALT_valid<-Lab1_ALT[!is.na(Lab1_ALT$refrange_hi),]
+Lab1_ALT_valid<-Lab1_ALT_valid[!is.na(Lab1_ALT_valid$result),]
+Lab1_ALT_valid<-Lab1_ALT_valid[!is.na(Lab1_ALT_valid$refrange_hi),]
+
+Lab2_ALT<-Lab2[Lab2$assay_item_name=="丙氨酸氨基转移酶(ALT)" |
+                 Lab2$assay_item_name=="丙氨酸氨基转氨酶" |
+                 Lab2$assay_item_name=="丙氨酸氨基转移酶(ALT)" |
+                 Lab2$assay_item_name=="谷丙氨酸转移酶" |
+                 Lab2$assay_item_name=="丙氨酸转氨酶(ALT)" |
+                 Lab2$assay_item_name=="丙氨酸转氨酶" |
+                 Lab2$assay_item_name=="丙氨酸氨基转氨酶(急)" |
+                 Lab2$assay_item_name=="血清丙氨酸氨基转移酶" |
+                 Lab2$assay_item_name=="丙氨酸氨基转移酶(ALT)*" |
+                 Lab2$assay_item_name=="丙氨酸转移酶" |
+                 Lab2$assay_item_name=="血清丙氨酸氨基转移酶测定(免)" |
+                 Lab2$assay_item_name=="丙氨酸氨基转移酶（急）" |
+                 Lab2$assay_item_name=="丙氨酸氨基转移酶测定" |
+                 Lab2$assay_item_name=="血清丙氨酸氨基转移酶测定" |
+                 Lab2$assay_item_name=="谷氨酸氨基转移酶" |
+                 Lab2$assay_item_name=="谷氨酸基转移酶" |
+                 Lab2$assay_item_name=="谷丙转氨酶" |
+                 Lab2$assay_item_name=="谷丙转氨酶(急)" |
+                 Lab2$assay_item_name=="谷丙氨酸转移酶" |
+                 Lab2$assay_item_name=="谷丙转氨酶(ALT)" |
+                 Lab2$assay_item_name=="谷丙转氨酶(速率法)" |
+                 Lab2$assay_item_name=="血清谷丙转氨酶" |
+                 Lab2$assay_item_name=="谷丙转氨酶（免费）" |
+                 Lab2$assay_item_name=="谷丙转氨酶（免）" |
+                 Lab2$assay_item_name=="谷丙酸氨基转移酶",]
+
+Lab2_ALT$refrange_hi[grepl("35", Lab2_ALT$refrange, fixed = TRUE)]<-35
+Lab2_ALT$refrange_hi[grepl("40", Lab2_ALT$refrange, fixed = TRUE)]<-40
+Lab2_ALT$refrange_hi[grepl("44", Lab2_ALT$refrange, fixed = TRUE)]<-44
+Lab2_ALT$refrange_hi[grepl("45", Lab2_ALT$refrange, fixed = TRUE)]<-45
+Lab2_ALT$refrange_hi[grepl("49", Lab2_ALT$refrange, fixed = TRUE)]<-49
+Lab2_ALT$refrange_hi[grepl("50", Lab2_ALT$refrange, fixed = TRUE)]<-50
+Lab2_ALT$refrange_hi[grepl("52", Lab2_ALT$refrange, fixed = TRUE)]<-52
+Lab2_ALT$refrange_hi[grepl("54", Lab2_ALT$refrange, fixed = TRUE)]<-54
+Lab2_ALT$refrange_hi[grepl("55", Lab2_ALT$refrange, fixed = TRUE)]<-55
+Lab2_ALT$refrange_hi[grepl("60", Lab2_ALT$refrange, fixed = TRUE)]<-60
+Lab2_ALT$refrange_hi[grepl("65", Lab2_ALT$refrange, fixed = TRUE)]<-65
+Lab2_ALT$refrange_hi[grepl("72", Lab2_ALT$refrange, fixed = TRUE)]<-72
+
+Lab2_ALT$result<-as.numeric(Lab2_ALT$result)
+
+Lab2_ALT_valid<-Lab2_ALT[!is.na(Lab2_ALT$refrange_hi),]
+Lab2_ALT_valid<-Lab2_ALT_valid[!is.na(Lab2_ALT_valid$result),]
+Lab2_ALT_valid<-Lab2_ALT_valid[!is.na(Lab2_ALT_valid$refrange_hi),]
+
+Lab_ALT_valid <- rbind(Lab1_ALT_valid,Lab2_ALT_valid)
+
+
+Lab_ALT_abn<-Lab_ALT_valid[Lab_ALT_valid$result>Lab_ALT_valid$refrange_hi,]
+Lab_ALT_2<-Lab_ALT_valid[Lab_ALT_valid$result>Lab_ALT_valid$refrange_hi*2,]
+Lab_ALT_5<-Lab_ALT_valid[Lab_ALT_valid$result>Lab_ALT_valid$refrange_hi*5,]
+Lab_ALT_10<-Lab_ALT_valid[Lab_ALT_valid$result>Lab_ALT_valid$refrange_hi*10,]
+
+ALT_id_abn<-Lab_ALT_abn %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(report_time), min, na.rm = TRUE)
+ALT_id_2N<-Lab_ALT_2 %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(report_time), min, na.rm = TRUE)
+ALT_id_5N<-Lab_ALT_5 %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(report_time), min, na.rm = TRUE)
+ALT_id_10N<-Lab_ALT_10 %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(report_time), min, na.rm = TRUE)
+
+#Find the maximum ALT value and dates
+ALT_max_id<-Lab_ALT_valid %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(result), max, na.rm = TRUE)
+ALT_max <- inner_join(Lab_ALT_valid,  ALT_max_id,  by = "idcard") 
+ALT_max <-ALT_max[ALT_max$result.x==ALT_max$result.y,]
+ALT_id_max_date<-ALT_max %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(report_time), min, na.rm = TRUE)
+
+ALT_max$Alt_max_ratio<-ALT_max$result.x/ALT_max$refrange_hi
+ALT_id_max_ratio<-ALT_max %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Alt_max_ratio), max, na.rm = TRUE)
+
+colnames(ALT_max_id)[colnames(ALT_max_id) %in% c("result")] <- c("ALT_max_result")
+colnames(ALT_id_max_date)[colnames(ALT_id_max_date) %in% c("report_time")] <- c("ALT_max_date")
+colnames(ALT_id_abn)[colnames(ALT_id_abn) %in% c("report_time")] <- c("ALT_abn_post_date")
+colnames(ALT_id_2N)[colnames(ALT_id_2N) %in% c("report_time")] <- c("ALT_2N_post_date")
+colnames(ALT_id_5N)[colnames(ALT_id_5N) %in% c("report_time")] <- c("ALT_5N_post_date")
+colnames(ALT_id_10N)[colnames(ALT_id_10N) %in% c("report_time")] <- c("ALT_10N_post_date")
+
+#ALP assessment from Lab1
+
+Lab1_ALP<-Lab1[Lab1$assay_item_name=="碱性磷酸酶" |
+                 Lab1$assay_item_name=="碱性磷酸酶(ALP)" |
+                 Lab1$assay_item_name=="碱性磷酸酶(ALP)*" |
+                 Lab1$assay_item_name=="碱性磷酸酶(速率法)" |
+                 Lab1$assay_item_name=="血清碱性磷酸酶测定(免)" |
+                 Lab1$assay_item_name=="碱性磷酸酶（免费）" |
+                 Lab1$assay_item_name=="碱性磷酸酶（免）" |
+                 Lab1$assay_item_name=="血清碱性磷酸酶" ,]
+
+Lab1_ALP$refrange_hi[grepl("125", Lab1_ALP$refrange, fixed = TRUE)]<-125
+Lab1_ALP$refrange_hi[grepl("100", Lab1_ALP$refrange, fixed = TRUE)]<-100
+Lab1_ALP$refrange_hi[grepl("135", Lab1_ALP$refrange, fixed = TRUE)]<-135
+Lab1_ALP$refrange_hi[grepl("150", Lab1_ALP$refrange, fixed = TRUE)]<-150
+Lab1_ALP$refrange_hi[grepl("112", Lab1_ALP$refrange, fixed = TRUE)]<-112
+Lab1_ALP$refrange_hi[grepl("140", Lab1_ALP$refrange, fixed = TRUE)]<-140
+Lab1_ALP$refrange_hi[grepl("126", Lab1_ALP$refrange, fixed = TRUE)]<-126
+Lab1_ALP$refrange_hi[grepl("129", Lab1_ALP$refrange, fixed = TRUE)]<-129
+Lab1_ALP$refrange_hi[grepl("120", Lab1_ALP$refrange, fixed = TRUE)]<-120
+Lab1_ALP$refrange_hi[grepl("130", Lab1_ALP$refrange, fixed = TRUE)]<-130
+Lab1_ALP$refrange_hi[grepl("128", Lab1_ALP$refrange, fixed = TRUE)]<-128
+Lab1_ALP$refrange_hi[grepl("136", Lab1_ALP$refrange, fixed = TRUE)]<-136
+Lab1_ALP$refrange_hi[grepl("141", Lab1_ALP$refrange, fixed = TRUE)]<-141
+Lab1_ALP$refrange_hi[grepl("136", Lab1_ALP$refrange, fixed = TRUE)]<-136
+Lab1_ALP$refrange_hi[grepl("172", Lab1_ALP$refrange, fixed = TRUE)]<-172
+Lab1_ALP$refrange_hi[grepl("119", Lab1_ALP$refrange, fixed = TRUE)]<-119
+Lab1_ALP$refrange_hi[grepl("250", Lab1_ALP$refrange, fixed = TRUE)]<-250
+Lab1_ALP$refrange_hi[grepl("450", Lab1_ALP$refrange, fixed = TRUE)]<-450
+Lab1_ALP$refrange_hi[grepl("180", Lab1_ALP$refrange, fixed = TRUE)]<-180
+Lab1_ALP$refrange_hi[grepl("170", Lab1_ALP$refrange, fixed = TRUE)]<-170
+Lab1_ALP$refrange_hi[grepl("500", Lab1_ALP$refrange, fixed = TRUE)]<-500
+Lab1_ALP$refrange_hi[grepl("142", Lab1_ALP$refrange, fixed = TRUE)]<-142
+Lab1_ALP$refrange_hi[grepl("750", Lab1_ALP$refrange, fixed = TRUE)]<-750
+Lab1_ALP$refrange_hi[grepl("90", Lab1_ALP$refrange, fixed = TRUE)]<-90
+Lab1_ALP$refrange_hi[grepl("98", Lab1_ALP$refrange, fixed = TRUE)]<-98
+Lab1_ALP$refrange_hi[grepl("135", Lab1_ALP$refrange, fixed = TRUE)]<-135
+Lab1_ALP$refrange_hi[grepl("162", Lab1_ALP$refrange, fixed = TRUE)]<-162
+Lab1_ALP$refrange_hi[grepl("320", Lab1_ALP$refrange, fixed = TRUE)]<-320
+
+Lab1_ALP$result<-as.numeric(Lab1_ALP$result)
+
+Lab1_ALP_valid<-Lab1_ALP[!is.na(Lab1_ALP$refrange_hi),]
+Lab1_ALP_valid<-Lab1_ALP_valid[!is.na(Lab1_ALP_valid$result),]
+Lab1_ALP_valid<-Lab1_ALP_valid[!is.na(Lab1_ALP_valid$refrange_hi),]
+
+#ALP assessment from Lab2
+
+Lab2_ALP<-Lab2[Lab2$assay_item_name=="碱性磷酸酶" |
+                 Lab2$assay_item_name=="碱性磷酸酶(ALP)" |
+                 Lab2$assay_item_name=="碱性磷酸酶(ALP)*" |
+                 Lab2$assay_item_name=="碱性磷酸酶(速率法)" |
+                 Lab2$assay_item_name=="血清碱性磷酸酶测定(免)" |
+                 Lab2$assay_item_name=="碱性磷酸酶（免费）" |
+                 Lab2$assay_item_name=="碱性磷酸酶（免）" |
+                 Lab2$assay_item_name=="血清碱性磷酸酶" ,]
+
+Lab2_ALP$refrange_hi[grepl("125", Lab2_ALP$refrange, fixed = TRUE)]<-125
+Lab2_ALP$refrange_hi[grepl("100", Lab2_ALP$refrange, fixed = TRUE)]<-100
+Lab2_ALP$refrange_hi[grepl("135", Lab2_ALP$refrange, fixed = TRUE)]<-135
+Lab2_ALP$refrange_hi[grepl("150", Lab2_ALP$refrange, fixed = TRUE)]<-150
+Lab2_ALP$refrange_hi[grepl("112", Lab2_ALP$refrange, fixed = TRUE)]<-112
+Lab2_ALP$refrange_hi[grepl("140", Lab2_ALP$refrange, fixed = TRUE)]<-140
+Lab2_ALP$refrange_hi[grepl("126", Lab2_ALP$refrange, fixed = TRUE)]<-126
+Lab2_ALP$refrange_hi[grepl("129", Lab2_ALP$refrange, fixed = TRUE)]<-129
+Lab2_ALP$refrange_hi[grepl("120", Lab2_ALP$refrange, fixed = TRUE)]<-120
+Lab2_ALP$refrange_hi[grepl("130", Lab2_ALP$refrange, fixed = TRUE)]<-130
+Lab2_ALP$refrange_hi[grepl("128", Lab2_ALP$refrange, fixed = TRUE)]<-128
+Lab2_ALP$refrange_hi[grepl("136", Lab2_ALP$refrange, fixed = TRUE)]<-136
+Lab2_ALP$refrange_hi[grepl("141", Lab2_ALP$refrange, fixed = TRUE)]<-141
+Lab2_ALP$refrange_hi[grepl("136", Lab2_ALP$refrange, fixed = TRUE)]<-136
+Lab2_ALP$refrange_hi[grepl("172", Lab2_ALP$refrange, fixed = TRUE)]<-172
+Lab2_ALP$refrange_hi[grepl("119", Lab2_ALP$refrange, fixed = TRUE)]<-119
+Lab2_ALP$refrange_hi[grepl("250", Lab2_ALP$refrange, fixed = TRUE)]<-250
+Lab2_ALP$refrange_hi[grepl("450", Lab2_ALP$refrange, fixed = TRUE)]<-450
+Lab2_ALP$refrange_hi[grepl("180", Lab2_ALP$refrange, fixed = TRUE)]<-180
+Lab2_ALP$refrange_hi[grepl("170", Lab2_ALP$refrange, fixed = TRUE)]<-170
+Lab2_ALP$refrange_hi[grepl("500", Lab2_ALP$refrange, fixed = TRUE)]<-500
+Lab2_ALP$refrange_hi[grepl("142", Lab2_ALP$refrange, fixed = TRUE)]<-142
+Lab2_ALP$refrange_hi[grepl("750", Lab2_ALP$refrange, fixed = TRUE)]<-750
+Lab2_ALP$refrange_hi[grepl("90", Lab2_ALP$refrange, fixed = TRUE)]<-90
+Lab2_ALP$refrange_hi[grepl("98", Lab2_ALP$refrange, fixed = TRUE)]<-98
+Lab2_ALP$refrange_hi[grepl("135", Lab2_ALP$refrange, fixed = TRUE)]<-135
+Lab2_ALP$refrange_hi[grepl("162", Lab2_ALP$refrange, fixed = TRUE)]<-162
+Lab2_ALP$refrange_hi[grepl("320", Lab2_ALP$refrange, fixed = TRUE)]<-320
+
+Lab2_ALP$result<-as.numeric(Lab2_ALP$result)
+
+Lab2_ALP_valid<-Lab2_ALP[!is.na(Lab2_ALP$refrange_hi),]
+Lab2_ALP_valid<-Lab2_ALP_valid[!is.na(Lab2_ALP_valid$result),]
+Lab2_ALP_valid<-Lab2_ALP_valid[!is.na(Lab2_ALP_valid$refrange_hi),]
+
+
+Lab_ALP_valid <- rbind(Lab1_ALP_valid,Lab2_ALP_valid)
+
+
+Lab_ALP_abn<-Lab_ALP_valid[Lab_ALP_valid$result>Lab_ALP_valid$refrange_hi,]
+Lab_ALP_2<-Lab_ALP_valid[Lab_ALP_valid$result>Lab_ALP_valid$refrange_hi*2,]
+Lab_ALP_5<-Lab_ALP_valid[Lab_ALP_valid$result>Lab_ALP_valid$refrange_hi*5,]
+Lab_ALP_10<-Lab_ALP_valid[Lab_ALP_valid$result>Lab_ALP_valid$refrange_hi*10,]
+
+ALP_id_abn<-Lab_ALP_abn %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(report_time), min, na.rm = TRUE)
+ALP_id_2N<-Lab_ALP_2 %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(report_time), min, na.rm = TRUE)
+ALP_id_5N<-Lab_ALP_5 %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(report_time), min, na.rm = TRUE)
+ALP_id_10N<-Lab_ALP_10 %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(report_time), min, na.rm = TRUE)
+
+#Find the maximum ALP value and dates
+ALP_max_id<-Lab_ALP_valid %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(result), max, na.rm = TRUE)
+ALP_max <- inner_join(Lab_ALP_valid,  ALP_max_id,  by = "idcard") 
+ALP_max <-ALP_max[ALP_max$result.x==ALP_max$result.y,]
+ALP_id_max_date<-ALP_max %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(report_time), min, na.rm = TRUE)
+
+ALP_max$ALP_max_ratio<-ALP_max$result.x/ALP_max$refrange_hi
+ALP_id_max_ratio<-ALP_max %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(ALP_max_ratio), max, na.rm = TRUE)
+
+colnames(ALP_max_id)[colnames(ALP_max_id) %in% c("result")] <- c("ALP_max_result")
+colnames(ALP_id_max_date)[colnames(ALP_id_max_date) %in% c("report_time")] <- c("ALP_max_date")
+colnames(ALP_id_abn)[colnames(ALP_id_abn) %in% c("report_time")] <- c("ALP_abn_post_date")
+colnames(ALP_id_2N)[colnames(ALP_id_2N) %in% c("report_time")] <- c("ALP_2N_post_date")
+colnames(ALP_id_5N)[colnames(ALP_id_5N) %in% c("report_time")] <- c("ALP_5N_post_date")
+colnames(ALP_id_10N)[colnames(ALP_id_10N) %in% c("report_time")] <- c("ALP_10N_post_date")
+
+
+#Tbil assessment
+Lab1_Tbil<-filter(Lab1, grepl("总胆红素",assay_item_name))
+
+Lab1_Tbil$refrange_hi[grepl("23", Lab1_Tbil$refrange, fixed = TRUE)]<-23
+Lab1_Tbil$refrange_hi[grepl("24", Lab1_Tbil$refrange, fixed = TRUE)]<-24
+Lab1_Tbil$refrange_hi[grepl("20.3", Lab1_Tbil$refrange, fixed = TRUE)]<-20.3
+Lab1_Tbil$refrange_hi[grepl("19.0", Lab1_Tbil$refrange, fixed = TRUE)]<-19
+Lab1_Tbil$refrange_hi[grepl("17.1", Lab1_Tbil$refrange, fixed = TRUE)]<-17.1
+Lab1_Tbil$refrange_hi[grepl("26.1", Lab1_Tbil$refrange, fixed = TRUE)]<-26.1
+Lab1_Tbil$refrange_hi[grepl("19.1", Lab1_Tbil$refrange, fixed = TRUE)]<-19.1
+Lab1_Tbil$refrange_hi[grepl("22.0", Lab1_Tbil$refrange, fixed = TRUE)]<-22
+Lab1_Tbil$refrange_hi[grepl("20.5", Lab1_Tbil$refrange, fixed = TRUE)]<-20.5
+Lab1_Tbil$refrange_hi[grepl("25.0", Lab1_Tbil$refrange, fixed = TRUE)]<-25
+Lab1_Tbil$refrange_hi[grepl("26.0", Lab1_Tbil$refrange, fixed = TRUE)]<-26
+Lab1_Tbil$refrange_hi[grepl("22.0", Lab1_Tbil$refrange, fixed = TRUE)]<-22
+Lab1_Tbil$refrange_hi[grepl("22", Lab1_Tbil$refrange, fixed = TRUE)]<-22
+Lab1_Tbil$refrange_hi[grepl("21.0", Lab1_Tbil$refrange, fixed = TRUE)]<-21
+Lab1_Tbil$refrange_hi[grepl("25", Lab1_Tbil$refrange, fixed = TRUE)]<-25
+Lab1_Tbil$refrange_hi[grepl("22.5", Lab1_Tbil$refrange, fixed = TRUE)]<-22.5
+Lab1_Tbil$refrange_hi[grepl("23.5", Lab1_Tbil$refrange, fixed = TRUE)]<-23.5
+Lab1_Tbil$refrange_hi[grepl("26", Lab1_Tbil$refrange, fixed = TRUE)]<-26
+Lab1_Tbil$refrange_hi[grepl("21.9", Lab1_Tbil$refrange, fixed = TRUE)]<-21.9
+Lab1_Tbil$refrange_hi[grepl("20", Lab1_Tbil$refrange, fixed = TRUE)]<-20
+Lab1_Tbil$refrange_hi[grepl("51", Lab1_Tbil$refrange, fixed = TRUE)]<-51
+Lab1_Tbil$refrange_hi[grepl("19", Lab1_Tbil$refrange, fixed = TRUE)]<-19
+Lab1_Tbil$refrange_hi[grepl("21", Lab1_Tbil$refrange, fixed = TRUE)]<-21
+Lab1_Tbil$refrange_hi[grepl("18.6", Lab1_Tbil$refrange, fixed = TRUE)]<-18.6
+Lab1_Tbil$refrange_hi[grepl("17", Lab1_Tbil$refrange, fixed = TRUE)]<-17
+
+Lab1_Tbil$result<-as.numeric(Lab1_Tbil$result)
+
+Lab1_Tbil_valid<-Lab1_Tbil[!is.na(Lab1_Tbil$refrange_hi),]
+Lab1_Tbil_valid<-Lab1_Tbil_valid[!is.na(Lab1_Tbil_valid$result),]
+Lab1_Tbil_valid<-Lab1_Tbil_valid[!is.na(Lab1_Tbil_valid$refrange_hi),]
+
+#Tbil assessment in Lab2 files
+Lab2_Tbil<-filter(Lab2, grepl("总胆红素",assay_item_name))
+
+Lab2_Tbil$refrange_hi[grepl("23", Lab2_Tbil$refrange, fixed = TRUE)]<-23
+Lab2_Tbil$refrange_hi[grepl("24", Lab2_Tbil$refrange, fixed = TRUE)]<-24
+Lab2_Tbil$refrange_hi[grepl("20.3", Lab2_Tbil$refrange, fixed = TRUE)]<-20.3
+Lab2_Tbil$refrange_hi[grepl("19.0", Lab2_Tbil$refrange, fixed = TRUE)]<-19
+Lab2_Tbil$refrange_hi[grepl("17.1", Lab2_Tbil$refrange, fixed = TRUE)]<-17.1
+Lab2_Tbil$refrange_hi[grepl("26.1", Lab2_Tbil$refrange, fixed = TRUE)]<-26.1
+Lab2_Tbil$refrange_hi[grepl("19.1", Lab2_Tbil$refrange, fixed = TRUE)]<-19.1
+Lab2_Tbil$refrange_hi[grepl("22.0", Lab2_Tbil$refrange, fixed = TRUE)]<-22
+Lab2_Tbil$refrange_hi[grepl("20.5", Lab2_Tbil$refrange, fixed = TRUE)]<-20.5
+Lab2_Tbil$refrange_hi[grepl("25.0", Lab2_Tbil$refrange, fixed = TRUE)]<-25
+Lab2_Tbil$refrange_hi[grepl("26.0", Lab2_Tbil$refrange, fixed = TRUE)]<-26
+Lab2_Tbil$refrange_hi[grepl("22.0", Lab2_Tbil$refrange, fixed = TRUE)]<-22
+Lab2_Tbil$refrange_hi[grepl("22", Lab2_Tbil$refrange, fixed = TRUE)]<-22
+Lab2_Tbil$refrange_hi[grepl("21.0", Lab2_Tbil$refrange, fixed = TRUE)]<-21
+Lab2_Tbil$refrange_hi[grepl("25", Lab2_Tbil$refrange, fixed = TRUE)]<-25
+Lab2_Tbil$refrange_hi[grepl("22.5", Lab2_Tbil$refrange, fixed = TRUE)]<-22.5
+Lab2_Tbil$refrange_hi[grepl("23.5", Lab2_Tbil$refrange, fixed = TRUE)]<-23.5
+Lab2_Tbil$refrange_hi[grepl("26", Lab2_Tbil$refrange, fixed = TRUE)]<-26
+Lab2_Tbil$refrange_hi[grepl("21.9", Lab2_Tbil$refrange, fixed = TRUE)]<-21.9
+Lab2_Tbil$refrange_hi[grepl("20", Lab2_Tbil$refrange, fixed = TRUE)]<-20
+Lab2_Tbil$refrange_hi[grepl("51", Lab2_Tbil$refrange, fixed = TRUE)]<-51
+Lab2_Tbil$refrange_hi[grepl("19", Lab2_Tbil$refrange, fixed = TRUE)]<-19
+Lab2_Tbil$refrange_hi[grepl("21", Lab2_Tbil$refrange, fixed = TRUE)]<-21
+Lab2_Tbil$refrange_hi[grepl("18.6", Lab2_Tbil$refrange, fixed = TRUE)]<-18.6
+Lab2_Tbil$refrange_hi[grepl("17", Lab2_Tbil$refrange, fixed = TRUE)]<-17
+
+Lab2_Tbil$result<-as.numeric(Lab2_Tbil$result)
+
+Lab2_Tbil_valid<-Lab2_Tbil[!is.na(Lab2_Tbil$refrange_hi),]
+Lab2_Tbil_valid<-Lab2_Tbil_valid[!is.na(Lab2_Tbil_valid$result),]
+Lab2_Tbil_valid<-Lab2_Tbil_valid[!is.na(Lab2_Tbil_valid$refrange_hi),]
+
+Lab_Tbil_valid <- rbind(Lab1_Tbil_valid,Lab2_Tbil_valid)
+
+
+Lab_Tbil_abn<-Lab_Tbil_valid[Lab_Tbil_valid$result>Lab_Tbil_valid$refrange_hi,]
+Lab_Tbil_2<-Lab_Tbil_valid[Lab_Tbil_valid$result>Lab_Tbil_valid$refrange_hi*2,]
+Lab_Tbil_5<-Lab_Tbil_valid[Lab_Tbil_valid$result>Lab_Tbil_valid$refrange_hi*5,]
+Lab_Tbil_10<-Lab_Tbil_valid[Lab_Tbil_valid$result>Lab_Tbil_valid$refrange_hi*10,]
+
+Tbil_id_abn<-Lab_Tbil_abn %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(report_time), min, na.rm = TRUE)
+Tbil_id_2N<-Lab_Tbil_2 %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(report_time), min, na.rm = TRUE)
+Tbil_id_5N<-Lab_Tbil_5 %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(report_time), min, na.rm = TRUE)
+Tbil_id_10N<-Lab_Tbil_10 %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(report_time), min, na.rm = TRUE)
+
+#Find the maximum Tbil value and dates
+Tbil_max_id<-Lab_Tbil_valid %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(result), max, na.rm = TRUE)
+Tbil_max <- inner_join(Lab_Tbil_valid,  Tbil_max_id,  by = "idcard") 
+Tbil_max <-Tbil_max[Tbil_max$result.x==Tbil_max$result.y,]
+Tbil_id_max_date<-Tbil_max %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(report_time), min, na.rm = TRUE)
+
+Tbil_max$Tbil_max_ratio<-Tbil_max$result.x/Tbil_max$refrange_hi
+Tbil_id_max_ratio<-Tbil_max %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Tbil_max_ratio), max, na.rm = TRUE)
+
+colnames(Tbil_max_id)[colnames(Tbil_max_id) %in% c("result")] <- c("Tbil_max_result")
+colnames(Tbil_id_max_date)[colnames(Tbil_id_max_date) %in% c("report_time")] <- c("Tbil_max_date")
+colnames(Tbil_id_abn)[colnames(Tbil_id_abn) %in% c("report_time")] <- c("Tbil_abn_post_date")
+colnames(Tbil_id_2N)[colnames(Tbil_id_2N) %in% c("report_time")] <- c("Tbil_2N_post_date")
+colnames(Tbil_id_5N)[colnames(Tbil_id_5N) %in% c("report_time")] <- c("Tbil_5N_post_date")
+colnames(Tbil_id_10N)[colnames(Tbil_id_10N) %in% c("report_time")] <- c("Tbil_10N_post_date")
+
+
+#Assessment of INR in Lab1 file
+Lab1_INR<-filter(Lab1, grepl("国际标准化",assay_item_name)|
+                   grepl("国际比",assay_item_name)|
+                   grepl("国际正常化",assay_item_name)|
+                   grepl("国际标比",assay_item_name)|
+                   grepl("国际化标准比",assay_item_name))
+
+
+Lab1_INR$result<-as.numeric(Lab1_INR$result)
+
+Lab1_INR_valid<-Lab1_INR[!is.na(Lab1_INR$result),]
+
+#Assessment of INR in Lab2 file
+Lab2_INR<-filter(Lab2, grepl("国际标准化",assay_item_name)|
+                   grepl("国际比",assay_item_name)|
+                   grepl("国际正常化",assay_item_name)|
+                   grepl("国际标比",assay_item_name)|
+                   grepl("国际化标准比",assay_item_name))
+
+
+Lab2_INR$result<-as.numeric(Lab2_INR$result)
+
+Lab2_INR_valid<-Lab2_INR[!is.na(Lab2_INR$result),]
+
+Lab_INR_valid <- rbind(Lab1_INR_valid,Lab2_INR_valid)
+
+
+Lab_INR_valid$refrange_hi[grepl("0.9-1.2", Lab_INR_valid$refrange, fixed = TRUE)]<-1.20
+Lab_INR_valid$refrange_hi[grepl("0.8-1.5", Lab_INR_valid$refrange, fixed = TRUE)]<-1.50
+Lab_INR_valid$refrange_hi[grepl("0.8-1.3", Lab_INR_valid$refrange, fixed = TRUE)]<-1.30
+
+Lab_INR_valid$refrange_hi[grepl("1.80", Lab_INR_valid$refrange, fixed = TRUE)]<-1.80
+Lab_INR_valid$refrange_hi[grepl("1.50", Lab_INR_valid$refrange, fixed = TRUE)]<-1.50
+Lab_INR_valid$refrange_hi[grepl("1.31", Lab_INR_valid$refrange, fixed = TRUE)]<-1.31
+Lab_INR_valid$refrange_hi[grepl("1.30", Lab_INR_valid$refrange, fixed = TRUE)]<-1.30
+Lab_INR_valid$refrange_hi[grepl("1.28", Lab_INR_valid$refrange, fixed = TRUE)]<-1.28
+Lab_INR_valid$refrange_hi[grepl("1.27", Lab_INR_valid$refrange, fixed = TRUE)]<-1.27
+Lab_INR_valid$refrange_hi[grepl("1.26", Lab_INR_valid$refrange, fixed = TRUE)]<-1.26
+Lab_INR_valid$refrange_hi[grepl("1.25", Lab_INR_valid$refrange, fixed = TRUE)]<-1.25
+Lab_INR_valid$refrange_hi[grepl("1.21", Lab_INR_valid$refrange, fixed = TRUE)]<-1.21
+Lab_INR_valid$refrange_hi[grepl("1.20", Lab_INR_valid$refrange, fixed = TRUE)]<-1.20
+Lab_INR_valid$refrange_hi[grepl("1.19", Lab_INR_valid$refrange, fixed = TRUE)]<-1.19
+Lab_INR_valid$refrange_hi[grepl("1.18", Lab_INR_valid$refrange, fixed = TRUE)]<-1.18
+Lab_INR_valid$refrange_hi[grepl("1.17", Lab_INR_valid$refrange, fixed = TRUE)]<-1.17
+Lab_INR_valid$refrange_hi[grepl("1.16", Lab_INR_valid$refrange, fixed = TRUE)]<-1.16
+Lab_INR_valid$refrange_hi[grepl("1.15", Lab_INR_valid$refrange, fixed = TRUE)]<-1.15
+Lab_INR_valid$refrange_hi[grepl("1.13", Lab_INR_valid$refrange, fixed = TRUE)]<-1.13
+Lab_INR_valid$refrange_hi[grepl("1.12", Lab_INR_valid$refrange, fixed = TRUE)]<-1.12
+Lab_INR_valid$refrange_hi[grepl("1.11", Lab_INR_valid$refrange, fixed = TRUE)]<-1.11
+Lab_INR_valid$refrange_hi[grepl("1.09", Lab_INR_valid$refrange, fixed = TRUE)]<-1.09
+Lab_INR_valid$refrange_hi[grepl("1.08", Lab_INR_valid$refrange, fixed = TRUE)]<-1.08
+Lab_INR_valid$refrange_hi[is.na(Lab_INR_valid$refrange_hi)]<-1.25
+
+Lab_INR_abn<-Lab_INR_valid[Lab_INR_valid$result>Lab_INR_valid$refrange_hi,]
+Lab_INR_2<-Lab_INR_valid[Lab_INR_valid$result>2,]
+Lab_INR_3<-Lab_INR_valid[Lab_INR_valid$result>3,]
+Lab_INR_45<-Lab_INR_valid[Lab_INR_valid$result>4.5,]
+
+INR_id_abn<-Lab_INR_abn %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(report_time), min, na.rm = TRUE)
+INR_id_2N<-Lab_INR_2 %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(report_time), min, na.rm = TRUE)
+INR_id_3N<-Lab_INR_3 %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(report_time), min, na.rm = TRUE)
+INR_id_45N<-Lab_INR_45 %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(report_time), min, na.rm = TRUE)
+
+#Find the maximum INR value and dates
+INR_max_id<-Lab_INR_valid %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(result), max, na.rm = TRUE)
+INR_max <- inner_join(Lab_INR_valid,  INR_max_id,  by = "idcard") 
+INR_max <-INR_max[INR_max$result.x==INR_max$result.y,]
+INR_id_max_date<-INR_max %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(report_time), min, na.rm = TRUE)
+
+colnames(INR_max_id)[colnames(INR_max_id) %in% c("result")] <- c("INR_max_result")
+colnames(INR_id_max_date)[colnames(INR_id_max_date) %in% c("report_time")] <- c("INR_max_date")
+colnames(INR_id_abn)[colnames(INR_id_abn) %in% c("report_time")] <- c("INR_abn_post_date")
+colnames(INR_id_2N)[colnames(INR_id_2N) %in% c("report_time")] <- c("INR_2N_post_date")
+colnames(INR_id_3N)[colnames(INR_id_3N) %in% c("report_time")] <- c("INR_3N_post_date")
+colnames(INR_id_45N)[colnames(INR_id_45N) %in% c("report_time")] <- c("INR_45N_post_date")
+
+#PTA 凝血酶原活动度
+Lab1_PTA<-filter(Lab1, grepl("凝血酶原活动",assay_item_name))
+Lab2_PTA<-filter(Lab2, grepl("凝血酶原活动",assay_item_name))
+
+Lab1_PTA$result<-as.numeric(Lab1_PTA$result)
+Lab1_PTA_valid<-Lab1_PTA[!is.na(Lab1_PTA$result),]
+Lab2_PTA$result<-as.numeric(Lab2_PTA$result)
+Lab2_PTA_valid<-Lab2_PTA[!is.na(Lab2_PTA$result),]
+
+Lab_PTA_valid <- rbind(Lab1_PTA_valid,Lab2_PTA_valid)
+
+#Find below 40% PTA
+Lab_PTA_40<-Lab_PTA_valid[Lab_PTA_valid$result<40,]
+PTA_id_40<-Lab_PTA_40 %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(report_time), min, na.rm = TRUE)
+#Find minimum PTA value and occurred date
+PTA_min_id<-Lab_PTA_valid %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(result), min, na.rm = TRUE)
+PTA_min <- inner_join(Lab_PTA_valid,  PTA_min_id,  by = "idcard") 
+PTA_min <-PTA_min[PTA_min$result.x==PTA_min$result.y,]
+PTA_id_min_date<-PTA_min %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(report_time), min, na.rm = TRUE)
+colnames(PTA_min_id)[colnames(PTA_min_id) %in% c("result")] <- c("PTA_min_result")
+colnames(PTA_id_min_date)[colnames(PTA_id_min_date) %in% c("report_time")] <- c("PTA_min_date")
+
+colnames(PTA_id_40)[colnames(PTA_id_40) %in% c("report_time")] <- c("PTA_40_post_date")
+
+
+#export valuable lab files
+setwd("E:/Ningbo Projects/TB/TB project/Workingd/CSV files/")
+Sys.setlocale(category = "LC_ALL",local="chinese")
+
+write_excel_csv(Lab_ALT_valid,"Lab_ALT_post_0113.csv")
+write_excel_csv(Lab_ALP_valid,"Lab_ALP_post_0113.csv")
+write_excel_csv(Lab_Tbil_valid,"Lab_Tbil_post_0113.csv")
+write_excel_csv(Lab_INR_valid,"Lab_INR_post_0113.csv")
+write_excel_csv(Lab_PTA_valid,"Lab_PTA_post_0113.csv")
+
+#Merge all lab findings to the analytic id list
+id_list1 <- left_join(id_list,  ALT_max_id, by = "idcard") 
+id_list1 <- left_join(id_list1,  ALT_id_max_date, by = "idcard") 
+
+id_list1 <- left_join(id_list1,  ALT_id_abn, by = "idcard") 
+id_list1 <- left_join(id_list1,  ALT_id_2N, by = "idcard") 
+id_list1 <- left_join(id_list1,  ALT_id_5N, by = "idcard") 
+id_list1 <- left_join(id_list1,  ALT_id_10N, by = "idcard") 
+
+id_list1 <- left_join(id_list1,  ALP_max_id, by = "idcard") 
+id_list1 <- left_join(id_list1,  ALP_id_max_date, by = "idcard") 
+
+id_list1 <- left_join(id_list1,  ALP_id_abn, by = "idcard") 
+id_list1 <- left_join(id_list1,  ALP_id_2N, by = "idcard") 
+id_list1 <- left_join(id_list1,  ALP_id_5N, by = "idcard") 
+id_list1 <- left_join(id_list1,  ALP_id_10N, by = "idcard") 
+
+id_list1 <- left_join(id_list1,  Tbil_max_id, by = "idcard") 
+id_list1 <- left_join(id_list1,  Tbil_id_max_date, by = "idcard") 
+
+id_list1 <- left_join(id_list1,  Tbil_id_abn, by = "idcard") 
+id_list1 <- left_join(id_list1,  Tbil_id_2N, by = "idcard") 
+id_list1 <- left_join(id_list1,  Tbil_id_5N, by = "idcard") 
+id_list1 <- left_join(id_list1,  Tbil_id_10N, by = "idcard") 
+
+id_list1 <- left_join(id_list1,  INR_max_id, by = "idcard") 
+id_list1 <- left_join(id_list1,  INR_id_max_date, by = "idcard") 
+
+id_list1 <- left_join(id_list1,  INR_id_abn, by = "idcard") 
+id_list1 <- left_join(id_list1,  INR_id_2N, by = "idcard") 
+id_list1 <- left_join(id_list1,  INR_id_3N, by = "idcard") 
+id_list1 <- left_join(id_list1,  INR_id_45N, by = "idcard") 
+
+id_list1 <- left_join(id_list1,  PTA_min_id, by = "idcard") 
+id_list1 <- left_join(id_list1,  PTA_id_min_date, by = "idcard") 
+
+id_list1 <- left_join(id_list1,  PTA_id_40, by = "idcard") 
+
+
+write_excel_csv(id_list1,"id_list_0113_final.csv")
