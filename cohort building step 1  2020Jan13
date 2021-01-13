@@ -1,0 +1,62 @@
+library(tidyverse)
+library(readxl)
+library(dplyr)
+library(lubridate)
+library(doBy)
+library(plyr)
+library(readr)     
+library(frequency)   
+library(DescTools)
+library(purrr)
+Sys.setenv(JAVA_HOME='C:\\Program Files\\Java\\jre1.8.0_261\\jre')
+library(rJava)
+library(xlsx)
+library(lubridate)
+library(dostats)
+
+
+id_list<-read_xlsx("E:/Ningbo Projects/TB/TB project/Raw data/Demo/Demographics.xlsx")
+id_list$Dob<-as.Date(id_list$Dob, "%Y/%m/%d")
+
+#TB case identification
+# TB case from OPT Pharm
+
+
+setwd("E:/Ningbo Projects/TB/TB project/Workingd/CSV files/")
+Sys.setlocale(category = "LC_ALL",local="chinese")
+IPT<-read_csv("IPT.csv")
+OPT<-read_csv("OPT.csv")
+IPT_pharm<-read_csv("IPT_pharm.csv")
+OPT_pharm<-read_csv("OPT_pharm.csv")
+
+TB_list<-read_xlsx("E:/Ningbo Projects/TB/TB project/Raw data/Outcome/idcase1519.xlsx")
+
+summary_TB_list<-id_list %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Dob), min, na.rm = TRUE)
+
+by_species <- id_list %>%  group_by(idcard)
+unique_id<-by_species %>%  summarise_all(list(min))
+
+by_species <- TB_list %>%
+  group_by(idcard)
+
+unique_TB_id<-by_species %>%
+  summarise_all(list(min))
+
+id_list1 <- inner_join(unique_TB_id, unique_id, by = "idcard") 
+
+by_species <- OPT %>%  group_by(idcard)
+unique_id<-by_species %>%  summarise_all(list(min,max))
+unique_id <- unique_id %>% select(idcard, clinic_time_fn1, clinic_time_fn2)
+colnames(unique_id)[colnames(unique_id) %in% c("clinic_time_fn1","clinic_time_fn2")] <- c("OPT_min_date","OPT_max_date")
+id_list2 <- left_join(id_list1, unique_id, by = "idcard") 
+
+by_species <- IPT %>%  group_by(idcard)
+unique_id<-by_species %>%  summarise_all(list(min,max))
+unique_id <- unique_id %>% select(idcard, adm_time_fn1, adm_time_fn2,dis_time_fn1, dis_time_fn2)
+colnames(unique_id)[colnames(unique_id) %in% 
+      c("adm_time_fn1","adm_time_fn2","dis_time_fn1","dis_time_fn2")]<- c("min_admdate","max_admdate","min_disdate","max_disdate")
+id_list3<- left_join(id_list2, unique_id, by = "idcard") 
+id_list3$Dx_date<-as.Date(id_list3$Dx_date)
+#Add timing of DILI as well as severity
