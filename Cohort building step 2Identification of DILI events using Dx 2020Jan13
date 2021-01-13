@@ -1,0 +1,94 @@
+#Assessment of exposure for DILI
+#Load IPT OPT and Pharm files
+setwd("E:/Ningbo Projects/TB/TB project/Workingd/CSV files/")
+
+IPT<-read_csv("IPT.csv")
+OPT<-read_csv("OPT.csv")
+IPT_pharm<-read_csv("IPT_pharm.csv")
+OPT_pharm<-read_csv("OPT_pharm.csv")
+Lab1<-read_csv("Lab1.csv")
+Lab2<-read_csv("Lab2.csv")
+
+
+#extract all DILI diagnosis
+#liver injury by diagnosis codes
+Case_OPT_pharm<-filter(OPT_pharm, grepl("药物性肝",disease_name))
+Case_OPT_pharm$Case_time<-Case_OPT_pharm$clinic_time
+
+Case_OPT<-filter(OPT, grepl("药物性肝",disease_name))
+Case_OPT$Case_time<-Case_OPT$clinic_time
+
+Case_IPT<-filter(IPT, grepl("药物性肝",disease_name))
+Case_IPT$Case_time<-Case_IPT$dis_time
+
+Case_OPT_pharm <- Case_OPT_pharm %>% select(idcard,  Case_time)
+Case_OPT <- Case_OPT %>% select(idcard,  Case_time)
+Case_IPT <- Case_IPT %>% select(idcard,  Case_time)
+
+Case_OPT_pharm$Case_type  <- "OPT_pharm"
+Case_OPT$Case_type        <- "OPT"
+Case_IPT$Case_type        <- "IPT"
+
+Case_all<-rbind(Case_OPT_pharm,Case_OPT,Case_IPT)
+
+id_list_index<-id_list3 %>% select(idcard,  Dx_date, )
+
+Case_all_index <- inner_join(Case_all,id_list_index,  by = "idcard") 
+
+by_species <- Case_all_index %>%  group_by(idcard)
+unique_DILI_id_all<-by_species %>%  summarise_all(list(min))
+
+table(unique_DILI_id_post$Case_type_fn1)
+
+Case_all_pre<- Case_all_index[Case_all_index$Case_time<Case_all_index$Dx_date,]
+Case_all_post<- Case_all_index[Case_all_index$Case_time>=Case_all_index$Dx_date,]
+
+by_species <- Case_all_pre %>%  group_by(idcard)
+unique_DILI_id_pre<-by_species %>%  summarise_all(list(min))
+unique_DILI_id_pre<-unique_DILI_id_pre[!is.na(unique_DILI_id_pre$idcard),]
+
+unique_DILI_id_pre<-unique_DILI_id_pre %>% select(idcard,  Case_time, Case_type,)
+colnames(unique_DILI_id_pre)[colnames(unique_DILI_id_pre) %in% c("Case_time", "Case_type")] <- c("DILI_pre_date", "DILI_pre_type")
+
+
+by_species <- Case_all_post %>%  group_by(idcard)
+unique_DILI_id_post<-by_species %>%  summarise_all(list(min,max))
+unique_DILI_id_post<-unique_DILI_id_post[!is.na(unique_DILI_id_post$idcard),]
+
+unique_DILI_id_post<-unique_DILI_id_post[ (unique_DILI_id_post$Case_type_fn1=="IPT") |
+                                          (unique_DILI_id_post$Case_type_fn2=="IPT") |
+                                          (unique_DILI_id_post$Case_time_fn1 != unique_DILI_id_post$Case_time_fn2),]
+
+unique_DILI_id_post<-unique_DILI_id_post %>% select(idcard,  Case_time_fn1, Case_type_fn1,)
+colnames(unique_DILI_id_post)[colnames(unique_DILI_id_post) %in% c("Case_time_fn1", "Case_type_fn1")] <- c("DILI_post_date", "DILI_post_type")
+
+#Merge with primary id_list on IPT Dx for DILI
+id_list4 <- left_join(id_list3,  unique_DILI_id_pre,  by = "idcard") 
+id_list5 <- left_join(id_list4,  unique_DILI_id_post, by = "idcard") 
+
+
+write_excel_csv(id_list5,"id_list_0113.csv")
+
+#liver injury by lab findings
+#https://link.springer.com/article/10.1007/s12072-017-9793-2
+#Grade 0 (no liver injury): Patients tolerate drug treatment and have no hepatotoxic reactions.
+#Grade 1 (mild liver injury): Elevations in serum ALT and/or ALP levels, TBil <2.5 ULN (2.5 mg/dL or 42.75 μmol/L), INR <1.5. Most patients show adaptability to the liver injury. Patients may present with or without symptoms such as fatigue, asthenia, nausea, anorexia, right upper abdominal pain, jaundice, pruritus, rashes, or weight loss [3, 117].
+#Grade 2 (moderate liver injury): Elevated serum ALT and/or ALP, with TBil ≥2.5 ULN or INR ≥1.5. The above mentioned symptoms may become aggravated.
+#Grade 3 (severe liver injury): Elevated serum ALT and/or ALP, TBil ≥5 ULN (5 mg/dL or 85.5 μmol/L) with or without INR ≥1.5. The symptoms are further aggravated, which indicates the need of hospitalization or delayed hospital stay, but there is no evidence of hepatic encephalopathy.
+#Grade 4 (ALF): Evidence of coagulation abnormality indicated by INR ≥1.5 [115, 116] or PTA <40% [115], signs of hepatic encephalopathy, and TBil ≥10 ULN (10 mg/dL or 171 μmol/L) or daily elevation ≥1.0 mg/dL (17.1 μmol/L) [115] in 26 weeks after the DILI onset. Patients may have ascites and DILI-related dysfunction of other organs. If there is evidence of underlying chronic liver diseases, especially liver cirrhosis, the diagnosis of acute-on-chronic liver failure (ACLF) is established.
+#Grade 5 (lethal): Death due to DILI, or need to receive liver transplantation for survival.
+
+
+
+
+
+x<-Freq(Lab1$assay_item_name, ord = "desc")
+
+x<-Freq(Lab1_Tbil$refrange)
+x<-Freq(Lab1_ALP_valid$refrange)
+x<-Freq(Lab_INR_valid$refrange)
+
+write.xlsx(x, file = "temp.xlsx", sheetName = "temp")
+
+
+
