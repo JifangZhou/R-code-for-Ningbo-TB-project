@@ -1,0 +1,40 @@
+#Load id_list
+
+id_list<-read_csv("id_list_0115_final.csv",
+                  col_types = cols(
+                    Hepaence_pre_dx_date = col_date(),
+                    Hepaence_post_dx_date = col_date()
+                  ))
+
+#Assessment of death dates
+
+colnames(id_list)[colnames(id_list) %in% c("死亡日期")] <- c("Death_date_certificate")
+
+id_list$Death_date<-id_list$Rx_end_date.x
+id_list$Death_date[!(grepl("死亡",id_list$Rx_end_reason.x) | !is.na(id_list$Death_date_certificate))]<-NA
+
+id_list$Death_TB_related<-if_else(!is.na(id_list$Death_date) & id_list$Rx_end_reason.x=="结核死亡",1,0)
+
+id_list$Rx_outcome[id_list$Rx_end_reason.x=="结核死亡"]<-"TB_death"
+id_list$Rx_outcome[id_list$Rx_end_reason.x=="非结核死亡"]<-"Non_TB_death"
+
+id_list$Rx_outcome[id_list$Rx_end_reason.x=="不良反应"]<-"ADR"
+id_list$Rx_outcome[id_list$Rx_end_reason.x=="丢失"]<-"LTF"
+id_list$Rx_outcome[id_list$Rx_end_reason.x=="其它" | is.na(id_list$Rx_end_reason.x)]<-"Other"
+id_list$Rx_outcome[id_list$Rx_end_reason.x=="失败"]<-"Rx_failure"
+id_list$Rx_outcome[id_list$Rx_end_reason.x=="完成疗程"]<-"Rx_completed"
+id_list$Rx_outcome[id_list$Rx_end_reason.x=="治愈"]<-"Cured"
+id_list$Rx_outcome[id_list$Rx_end_reason.x=="诊断变更"]<-"Dx_changed"
+id_list$Rx_outcome[id_list$Rx_end_reason.x=="转入耐多药治疗"]<-"MDR-TB"
+
+table(id_list$Rx_outcome,useNA = "ifany")
+
+id_list$Rx_success<-if_else(id_list$Rx_outcome=="Cured" | id_list$Rx_outcome=="Rx_completed" ,1,0)
+install.packages("tab")
+install.packages("Hmisc")
+library(tab)
+library(Hmisc)
+
+write_excel_csv(id_list,"id_list_0115_final1.csv")
+
+
