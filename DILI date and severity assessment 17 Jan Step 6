@@ -1,0 +1,251 @@
+library(dplyr)
+library(matrixStats)
+
+#Survival analysis on DILI outcomes
+#Load analytic list
+id_list<-read_csv("id_list_0117_final1.csv",
+                  col_types = cols(
+                    Hepaence_pre_dx_date = col_date(),
+                    Hepaence_post_dx_date = col_date()
+                  ))
+id_list_index<-id_list %>% select(idcard,  Dx_date, )
+
+
+
+#Assessment of whether the subject has been treated at least twice at baseline
+setwd("E:/Ningbo Projects/TB/TB project/Workingd/CSV files/")
+
+IPT<-read_csv("IPT.csv")
+OPT<-read_csv("OPT.csv")
+IPT_pharm<-read_csv("IPT_pharm.csv")
+OPT_pharm<-read_csv("OPT_pharm.csv")
+
+
+IPT_dates<-IPT %>% select(idcard,  adm_time, )
+OPT_dates<-OPT %>% select(idcard,  clinic_time, )
+IPT_pharm_dates<-IPT_pharm %>% select(idcard,  intake_start_time, )
+OPT_pharm_dates<-OPT_pharm %>% select(idcard,  clinic_time, )
+
+colnames(IPT_dates)[colnames(IPT_dates) %in% c("adm_time")] <- c("clinic_time")
+colnames(IPT_pharm_dates)[colnames(IPT_pharm_dates) %in% c("intake_start_time")] <- c("clinic_time")
+
+dates_list<-rbind(IPT_dates, OPT_dates ,IPT_pharm_dates,OPT_pharm_dates)
+
+dates_list_index <- inner_join(dates_list,id_list_index,  by = "idcard")
+
+dates_list_baseline <- dates_list_index[dates_list_index$clinic_time>=dates_list_index$Dx_date-365 & 
+                                        dates_list_index$clinic_time<dates_list_index$Dx_date,]
+by_species <- dates_list_baseline %>%  group_by(idcard)
+unique_dates_id<-by_species %>%  summarise_all(list(min,max))
+unique_dates_id<-unique_dates_id[unique_dates_id$clinic_time_fn1 != unique_dates_id$clinic_time_fn2,]
+unique_dates_id$Two_encounter_baseline<-1
+
+unique_dates_id<-unique_dates_id %>% select(idcard,  Two_encounter_baseline, )
+id_list1 <- left_join(id_list,  unique_dates_id, by = "idcard") 
+
+
+
+#To include health records from Hx and Vital results
+setwd("E:/Ningbo Projects/TB/TB project/Raw data/Hx/")
+ldf <- list() # creates a list
+listxlsx <- dir(pattern = "*.xlsx") # creates the list of all the xlsx files in the directory
+Hx <- ldply(listxlsx, read_xlsx)
+
+Hx_HTA<-filter(Hx, grepl("高血压",Hx))
+summary_Hx_HTA<-Hx_HTA %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Hx), min, na.rm = TRUE)
+summary_Hx_HTA$Hx_HTA<-1
+summary_Hx_HTA<-summary_Hx_HTA %>% select(idcard,  Hx_HTA, )
+#Join HTA to id_list
+id_list1 <- left_join(id_list1, summary_Hx_HTA, by = "idcard") 
+
+Hx_case<-filter(Hx, grepl("糖尿病",Hx))
+summary_case<-Hx_case %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Hx), min, na.rm = TRUE)
+summary_case$Hx_Diabetes<-1
+summary_case<-summary_case %>% select(idcard,  Hx_Diabetes, )
+id_list1 <- left_join(id_list1, summary_case, by = "idcard") 
+
+
+Hx_case<-filter(Hx, grepl("慢性阻塞性肺",Hx) | grepl("哮喘",Hx) | grepl("慢性支气管炎",Hx) | grepl("肺气肿",Hx))
+summary_case<-Hx_case %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Hx), min, na.rm = TRUE)
+summary_case$Hx_COPD<-1
+summary_case<-summary_case %>% select(idcard,  Hx_COPD, )
+id_list1 <- left_join(id_list1, summary_case, by = "idcard") 
+
+Hx_case<-filter(Hx, grepl("结核",Hx))
+summary_case<-Hx_case %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Hx), min, na.rm = TRUE)
+summary_case$Hx_TB<-1
+summary_case<-summary_case %>% select(idcard,  Hx_TB, )
+id_list1 <- left_join(id_list1, summary_case, by = "idcard") 
+
+Hx_case<-filter(Hx, grepl("胆固醇",Hx)| grepl("血脂",Hx) | grepl("甘油三酯",Hx)| grepl("脂蛋白增高",Hx) | grepl("脂蛋白偏高",Hx))
+summary_case<-Hx_case %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Hx), min, na.rm = TRUE)
+summary_case$Hx_Dyslipidemia<-1
+summary_case<-summary_case %>% select(idcard,  Hx_Dyslipidemia, )
+id_list1 <- left_join(id_list1, summary_case, by = "idcard") 
+
+Hx_case<-filter(Hx, (grepl("肿瘤",Hx) | grepl("癌",Hx)| grepl("CA",Hx)) & !grepl("癌胚抗原",Hx))
+summary_case<-Hx_case %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Hx), min, na.rm = TRUE)
+summary_case$Hx_Cancer<-1
+summary_case<-summary_case %>% select(idcard,  Hx_Cancer, )
+id_list1 <- left_join(id_list1, summary_case, by = "idcard") 
+
+Hx_case<-filter(Hx, grepl("冠状动脉",Hx)| grepl("冠心病",Hx) | grepl("心血管",Hx)| 
+                  grepl("心脑血管",Hx) | grepl("心脏病",Hx)| grepl("心肌缺血",Hx)|
+                  grepl("脑卒中",Hx) | grepl("中风",Hx)| grepl("脑血管",Hx)|
+                  grepl("脑出血",Hx) | grepl("脑动脉",Hx)| grepl("脑梗",Hx)|
+                  grepl("脑血栓",Hx) | grepl("脑溢血",Hx))
+
+summary_case<-Hx_case %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Hx), min, na.rm = TRUE)
+summary_case$Hx_CVD<-1
+summary_case<-summary_case %>% select(idcard,  Hx_CVD, )
+id_list1 <- left_join(id_list1, summary_case, by = "idcard") 
+
+Hx_case<-filter(Hx, grepl("乙肝",Hx)| grepl("乙型病毒性肝炎",Hx))
+
+summary_case<-Hx_case %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Hx), min, na.rm = TRUE)
+summary_case$Hx_HBV<-1
+summary_case<-summary_case %>% select(idcard,  Hx_HBV, )
+id_list1 <- left_join(id_list1, summary_case, by = "idcard") 
+
+Hx_case<-filter(Hx, grepl("肝囊肿",Hx)| grepl("肝炎",Hx)| grepl("肝硬化",Hx)| grepl("脂肪肝",Hx)| grepl("甲肝",Hx))
+Hx_case<-filter(Hx, grepl("肝",Hx))
+summary_case<-Hx_case %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Hx), min, na.rm = TRUE)
+summary_case$Hx_liver_disease<-1
+summary_case<-summary_case %>% select(idcard, Hx_liver_disease, )
+id_list1 <- left_join(id_list1, summary_case, by = "idcard") 
+
+#remove columns not wanted
+id_list9<-id_list8 %>% select(-contains('Hx.'))
+#smoking status
+summary_case<-Hx %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Smoking), min, na.rm = TRUE)
+
+summary_case$Smoking[summary_case$Smoking=="不吸烟"]<-"No_smoker"
+summary_case$Smoking[summary_case$Smoking=="吸烟"]<-"Smoker"
+summary_case$Smoking[summary_case$Smoking=="已戒烟"]<-"Former_smoker"
+summary_case$Smoking[grepl("是的", summary_case$Smoking, fixed=TRUE)]<-"Smoker"
+
+
+id_list1 <- left_join(id_list1, summary_case, by = "idcard") 
+
+#Alcohol status
+summary_case<-Hx %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Alcohol), min, na.rm = TRUE)
+
+summary_case$Alcohol[summary_case$Alcohol=="从不"]<-"Never"
+summary_case$Alcohol[summary_case$Alcohol=="从不喝"]<-"Never"
+summary_case$Alcohol[summary_case$Alcohol=="偶尔" |summary_case$Alcohol=="少于1天/月" |summary_case$Alcohol=="每天" |summary_case$Alcohol=="经常" |
+                       summary_case$Alcohol=="1-3天/月" ]<-"Drinker"
+
+
+id_list1 <- left_join(id_list1, summary_case, by = "idcard") 
+
+#Pregnancy status
+summary_case<-Hx %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(Pregnancy), min, na.rm = TRUE)
+
+summary_case$Pregnancy[summary_case$Pregnancy=="是"]<-1
+summary_case$Pregnancy[summary_case$Pregnancy=="否"]<-0
+
+id_list1 <- left_join(id_list1, summary_case, by = "idcard") 
+
+#To include Vital information on body weight, height at baseline defined as anytime before index
+Vital<-read_xlsx("E:/Ningbo Projects/TB/TB project/Raw data/Vital/Vital.xlsx")
+
+colnames(Vital)[colnames(Vital) 
+                %in% c("身份证号","姓名","结果","单位","测量时间","类型")] <- 
+                      c("idcard","name","result","unit","clinic_time","type")
+Vital$clinic_time<-as.Date(Vital$clinic_time)
+Vital_index <- inner_join(Vital,id_list_index,  by = "idcard")
+
+Vital_baseline <- Vital_index[Vital_index$clinic_time<=Vital_index$Dx_date,]
+
+Weight_baseline <-Vital_baseline[Vital_baseline$type=="体重" & !is.na(Vital_baseline$type),]
+Height_baseline <-Vital_baseline[Vital_baseline$type=="身高" & !is.na(Vital_baseline$type),]
+
+summary_Weight_baseline<-Weight_baseline %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(result), max, na.rm = TRUE)
+summary_Weight_baseline$result<-as.numeric(summary_Weight_baseline$result)
+summary_Weight_baseline<-summary_Weight_baseline[summary_Weight_baseline$result>0 & 
+                                                   summary_Weight_baseline$result<200 &
+                                                   !is.na(summary_Weight_baseline$result),]
+
+summary_Height_baseline<-Height_baseline %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(result), max, na.rm = TRUE)
+summary_Height_baseline$result<-as.numeric(summary_Height_baseline$result)
+summary_Height_baseline<-summary_Height_baseline[summary_Height_baseline$result>0 & !is.na(summary_Height_baseline$result),]
+summary_Height_baseline$result<-if_else(summary_Height_baseline$result>1000,summary_Height_baseline$result/10, summary_Height_baseline$result)
+summary_Height_baseline$result<-if_else(summary_Height_baseline$result<2,summary_Height_baseline$result*100, summary_Height_baseline$result)
+
+colnames(summary_Weight_baseline)[colnames(summary_Weight_baseline) 
+                %in% c("result")] <- c("Weight_baseline")
+colnames(summary_Height_baseline)[colnames(summary_Height_baseline) 
+                %in% c("result")] <- c("Height_baseline")
+
+#Sample size estimates
+id_list1 <- left_join(id_list1, summary_Weight_baseline, by = "idcard") 
+id_list1 <- left_join(id_list1, summary_Height_baseline, by = "idcard") 
+
+#remove unwanted cols
+id_list2<-id_list1 %>% select(-c("name.y","Dob.y","Rx_end_date.y","Rx_end_reason.y"))
+
+setwd("E:/Ningbo Projects/TB/TB project/Workingd/CSV files/")
+
+write_excel_csv(id_list2,"id_list_0117_final.csv")
+
+id_list2 <-id_list1[!id_list1$Rx_outcome=="Dx_changed",]
+id_list2 <-id_list2[!is.na(id_list2$Two_encounter_baseline),]
+
+df %>% mutate(total = rowSums(across(where(is.numeric))))
+
+id_list%>%
+  rowwise() %>%
+  mutate(
+    last_fol_up = max(c(OPT_max_date,max_admdate,max_disdate,Death_date), across(where(!is.na)))
+  )
+
+id_list %>% mutate(across(where(is.Date, ~max(.x, na.rm = T))))
+             
+
+table(is.na(id_list$last_fol_up))
+
+
+
+
+id_list$last_fol_up = apply(id_list[,c("OPT_max_date","max_admdate","max_disdate","Death_date")], 1, pmax)
+
+id_list%>%
+  replace(is.na(.), as.Date("2000-1-1")) %>% 
+  rowwise() %>%
+  mutate(
+    last_fol_up = max(c(OPT_max_date,max_admdate,max_disdate,Death_date), na.rm=TRUE)
+  )
+
+id_list %>%
+  rowwise() %>%
+  mutate(
+    last_fol_up = max(c(OPT_max_date,max_admdate,max_disdate,Death_date))
+  )
