@@ -1,0 +1,182 @@
+proc import datafile="E:\Ningbo Projects\TB\TB project\Workingd\CSV files\id_list_0117_final.csv"
+out=id_list  dbms=csv replace;
+getnames=yes;
+guessingrows=10000;
+RUN;
+
+data id_list1;
+    set id_list; 
+    array CHAR _character_ ; 
+do over CHAR; 
+    if CHAR="NA" then call missing(CHAR);
+    else if missing(CHAR) then CHAR=" ";
+end;
+run ;
+
+DATA id_list2;
+	SET id_list1;
+	array olddates $ M2_sputum_date M3_sputum_date M5_sputum_date Rx_date Rx_end_date_x
+					OPT_min_date OPT_max_date min_disdate  max_disdate DILI_pre_date DILI_post_date
+					ALT_max_date  ALT_abn_post_date ALT_2N_post_date ALT_5N_post_date ALT_10N_post_date
+					ALP_max_date  ALP_abn_post_date ALP_2N_post_date ALP_5N_post_date ALP_10N_post_date
+					Tbil_max_date Tbil_abn_post_date Tbil_2N_post_date Tbil_5N_post_date Tbil_10N_post_date
+ 					INR_max_date INR_abn_post_date INR_2N_post_date INR_3N_post_date INR_45N_post_date 
+					PTA_min_date PTA_40_post_date
+					Ascites_pre_dx_date 		Ascites_post_dx_date
+					Hepaence_pre_dx_date 		Hepaence_post_dx_date
+					Cirrhosis_pre_dx_date 		Cirrhosis_post_dx_date
+					Fattyliver_pre_dx_date 		Fattyliver_post_dx_date
+					HBV_pre_dx_date   			HBV_post_dx_date 
+					HCV_pre_dx_date 			HCV_post_dx_date 
+					AutoHepatitis_pre_dx_date 	AutoHepatitis_post_dx_date
+					ALT_max_baseline_date	ALT_abn_pre_date
+					ALP_max_baseline_date	ALP_abn_pre_date
+					Tbil_max_baseline_date 	Tbil_abn_pre_date
+					Death_date
+					last_fol_up min_admdate max_admdate;
+	array newdates dt1-dt57;
+		do i = 1 to dim(olddates);
+			newdates(i) = input(strip(olddates(i)),yymmdd10.);
+		end;
+		drop i;
+		format dt1-dt57 yymmdd10.;
+		DROP M2_sputum_date M3_sputum_date M5_sputum_date Rx_date Rx_end_date_x
+					OPT_min_date OPT_max_date min_disdate  max_disdate DILI_pre_date DILI_post_date
+					ALT_max_date  ALT_abn_post_date ALT_2N_post_date ALT_5N_post_date ALT_10N_post_date
+					ALP_max_date  ALP_abn_post_date ALP_2N_post_date ALP_5N_post_date ALP_10N_post_date
+					Tbil_max_date Tbil_abn_post_date Tbil_2N_post_date Tbil_5N_post_date Tbil_10N_post_date
+ 					INR_max_date INR_abn_post_date INR_2N_post_date INR_3N_post_date INR_45N_post_date 
+					PTA_min_date PTA_40_post_date
+					Ascites_pre_dx_date 		Ascites_post_dx_date
+					Hepaence_pre_dx_date 		Hepaence_post_dx_date
+					Cirrhosis_pre_dx_date 		Cirrhosis_post_dx_date
+					Fattyliver_pre_dx_date 		Fattyliver_post_dx_date
+					HBV_pre_dx_date   			HBV_post_dx_date 
+					HCV_pre_dx_date 			HCV_post_dx_date 
+					AutoHepatitis_pre_dx_date 	AutoHepatitis_post_dx_date
+					ALT_max_baseline_date	ALT_abn_pre_date
+					ALP_max_baseline_date	ALP_abn_pre_date
+					Tbil_max_baseline_date 	Tbil_abn_pre_date
+					Death_date
+					last_fol_up min_admdate max_admdate;
+RUN;
+DATA id_list3;
+	SET id_list2;
+	RENAME dt1=M2_sputum_date;  RENAME dt2=M3_sputum_date;RENAME dt3=M5_sputum_date;RENAME dt4=Rx_date;RENAME dt5=Rx_end_date_x;
+		  RENAME  dt6=OPT_min_date;  RENAME dt7=OPT_max_date;  RENAME dt8=min_disdate;  RENAME dt9=max_disdate;  RENAME dt10=DILI_pre_date;  RENAME dt11=DILI_post_date;
+		  RENAME  dt12=ALT_max_date;  RENAME dt13=ALT_abn_post_date;  RENAME dt14=ALT_2N_post_date;  RENAME dt15=ALT_5N_post_date;  RENAME dt16=ALT_10N_post_date;
+		  RENAME  dt17=ALP_max_date;  RENAME dt18=ALP_abn_post_date;  RENAME dt19=ALP_2N_post_date;  RENAME dt20=ALP_5N_post_date;  RENAME dt21=ALP_10N_post_date;
+		  RENAME  dt22=Tbil_max_date;  RENAME dt23=Tbil_abn_post_date;  RENAME dt24=Tbil_2N_post_date;  RENAME dt25=Tbil_5N_post_date;  RENAME dt26=Tbil_10N_post_date;
+ 		  RENAME  dt27=INR_max_date;  RENAME dt28=INR_abn_post_date;  RENAME dt29=INR_2N_post_date;  RENAME dt30=INR_3N_post_date;  RENAME dt31=INR_45N_post_date;
+		  RENAME  dt32=PTA_min_date;  RENAME dt33=PTA_40_post_date;  
+			RENAME dt34=Ascites_pre_dx_date;  RENAME dt35=Ascites_post_dx_date
+			;  RENAME dt36=Hepaence_pre_dx_date;  RENAME dt37=Hepaence_post_dx_date
+			;  RENAME dt38=Cirrhosis_pre_dx_date;  RENAME dt39=Cirrhosis_post_dx_date
+			;  RENAME dt40=Fattyliver_pre_dx_date;  RENAME dt41=Fattyliver_post_dx_date
+			;  RENAME dt42=HBV_pre_dx_date;  RENAME dt43=HBV_post_dx_date 
+			;  RENAME dt44=HCV_pre_dx_date;  RENAME dt45=HCV_post_dx_date 
+			;  RENAME dt46=AutoHepatitis_pre_dx_date;  RENAME dt47=AutoHepatitis_post_dx_date
+			;  RENAME dt48=ALT_max_baseline_date;  RENAME dt49=ALT_abn_pre_date
+			;  RENAME dt50=ALP_max_baseline_date;  RENAME dt51=ALP_abn_pre_date
+			;  RENAME dt52=Tbil_max_baseline_date;  RENAME dt53=Tbil_abn_pre_date
+			;  RENAME dt54=Death_date
+			;  RENAME dt55=last_fol_up;
+			RENAME dt56=min_admdate;RENAME dt57= max_admdate;
+RUN;
+
+PROC CONTENTS DATA=id_list1 VARNUM;RUN;
+PROC FREQ DATA=id_list3;
+	TABLE Rx_outcome;
+RUN;
+
+
+
+DATA id_list4;
+	SET id_list3;
+	last_fol_up=max(Rx_end_date_x, OPT_max_date, max_admdate, max_disdate, Death_date);
+	IF last_fol_up>Dx_date;
+	IF age_cal>=18;
+	IF Two_encounter_baseline=1;
+	IF Rx_outcome="Dx_changed" THEN DELETE;
+	Death_fol_up=min(last_fol_up, Death_date,22096,Dx_date+730)-Dx_date;
+	Death_status=0;
+	IF Death_fol_up=Death_date-Dx_date AND Death_date ^=. THEN Death_status=1;
+	IF Rx_success=. THEN Rx_success=1;
+
+	DILI_status=0;
+	DILI_fol_up=min(DILI_post_date,last_fol_up, Rx_end_date_x+180, Death_date,22096,Dx_date+730)-Dx_date;
+	IF DILI_post_date ^=. AND DILI_fol_up=DILI_post_date-Dx_date THEN DILI_status=1;
+	IF Death_date ^=. AND DILI_post_date =. THEN DILI_status=2;
+RUN;
+PROC FREQ DATA=id_list4;
+	TABLE Death_status Rx_success DILI_status Age_cal*Age_cat/missing;
+RUN; 
+PROC FREQ DATA=id_list3;
+	TABLE Age_cal*Age_cat Sex_y/missing;
+RUN; 
+PROC MEANS DATA=id_list4;
+	CLASS Death_status;
+	VAR Death_fol_up;
+RUN;
+
+PROC MEANS DATA=id_list4;
+	CLASS DILI_status;
+	VAR DILI_fol_up;
+RUN;
+
+proc phreg data=id_list4;
+class Sex_y  CCI_cat (ref="0")/ param=glm order=internal ref=first;
+model DILI_fol_up*DILI_status(0) = Sex_y Age_cal CCI_cat/ eventcode=1;
+hazardratio 'Subdistribution Hazards' Sex_y/ diff=pairwise;
+run;
+
+%CIF(DATA=id_list4,TIME=DILI_fol_up,STATUS=DILI_status,EVENT=1,CENSORED=0,GROUP=CCI_cat);
+
+*Cox PH model for death events;
+proc phreg data=id_list4;
+class Sex_y  CCI_cat (ref="0");
+model Death_fol_up*Death_status(0) = Sex_y Age_cal CCI_cat;
+hazardratio Sex_y / diff=pairwise;
+run;
+
+*Logistic regression on treatment success rates;
+proc logistic data=id_list4;
+      class Sex_y  CCI_cat (ref="0");
+      model DILI_status (ref= "0")= Sex_y Age_cal CCI_cat/ expb;
+   run;
+
+DATA id_list4;
+	SET id_list4;
+	DILI_final_recode=0;
+	IF DILI_status=1 THEN DILI_final_recode=1;
+	IF DILI_final_recode=0 THEN DILI_final=0;
+	MDR_TB_final=0;
+	IF Rx_outcome="MDR-TB" THEN MDR_TB_final=1;
+RUN;
+
+PROC FREQ DATA=id_list4;
+	TABLE Death_status Rx_success DILI_final Age_cal*Age_cat/missing;
+RUN; 
+PROC FREQ DATA=id_list4;
+	TABLE Death_status*DILI_final Rx_success*DILI_final MDR_TB_final*DILI_final/missing nopercent norow chisq;
+RUN; 
+
+proc logistic data=id_list4;
+      class Sex_y  CCI_cat (ref="0");
+      model DILI_final (ref= "0")= Sex_y Age_cal CCI_cat/ expb;
+run;
+
+proc logistic data=id_list4;
+      class Sex_y  CCI_cat (ref="0") DILI_final(ref="0") Age_cat(ref="0") ;
+      model MDR_TB_final (ref= "0")= Sex_y Age_cat DILI_final CCI_cat/ expb;
+run;
+
+proc logistic data=id_list4;
+      class Sex_y  CCI_cat (ref="0") DILI_final(ref="0");
+      model Rx_success (ref= "0")= Sex_y  CCI_cat DILI_final CCI_cat/ expb;
+run;
+
+proc logistic data=id_list4;
+      class Sex_y  CCI_cat (ref="0") DILI_final(ref="0");
+      model Rx_success (ref= "0")= Sex_y  CCI_cat DILI_final CCI_cat/ expb;
+run;
