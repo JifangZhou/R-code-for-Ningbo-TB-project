@@ -1,1 +1,63 @@
-<mxfile host="app.diagrams.net" modified="2021-01-22T06:16:00.774Z" agent="5.0 (Windows)" etag="byxlfwNtCOJzaFtFACfv" version="13.9.1" type="github"><diagram id="YtiaLkNR7NgyqbK74q9d" name="Page-1">dZHBDoIwDIafZnfYDOgZUS+eOHheWGVLBl3GDOjTC9kQFzTpof36d//WEVa049lyI68oQBOaiJGwI6E03VFK5kjE05M8Yx40VokgWkGlXhBgEuhDCegjoUPUTpkY1th1ULuIcWtxiGV31LGr4Q1sQFVzvaU3JZz0dE/zlV9ANXJxTrOD77R8EYeX9JILHL4QKwkrLKLzWTsWoOflLXvxc6c/3c/FLHTux8CUrGdPRfRDrHwD</diagram></mxfile>
+<mxfile host="app.diagrams.net" modified="2021-01-22T06:23:37.343Z" agent="5.0 (Windows)" etag="OZ8o1ZzNDOfsbnE89Z0T" version="13.9.1" type="github">
+  <diagram id="YtiaLkNR7NgyqbK74q9d" name="Page-1">
+    <mxGraphModel dx="1422" dy="763" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="wSTLIWxmNJqAhWngVWDl-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="wSTLIWxmNJqAhWngVWDl-1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="320" y="260" as="targetPoint" />
+            <mxPoint x="180" y="240" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wSTLIWxmNJqAhWngVWDl-1" value="&lt;div&gt;Patients with TB extracted from EHR&lt;/div&gt;&lt;div&gt;N=19,916&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="120" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="wSTLIWxmNJqAhWngVWDl-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="wSTLIWxmNJqAhWngVWDl-2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="320" y="260" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wSTLIWxmNJqAhWngVWDl-2" value="&lt;div&gt;Patients with TB from CDC registries&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=12,174&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="400" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="wSTLIWxmNJqAhWngVWDl-7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="wSTLIWxmNJqAhWngVWDl-5" target="wSTLIWxmNJqAhWngVWDl-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="wSTLIWxmNJqAhWngVWDl-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="wSTLIWxmNJqAhWngVWDl-5" target="wSTLIWxmNJqAhWngVWDl-8">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="320" y="340" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wSTLIWxmNJqAhWngVWDl-5" value="&lt;div&gt;Patients linked with both data sources&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=12,087&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="260" y="260" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="wSTLIWxmNJqAhWngVWDl-14" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="wSTLIWxmNJqAhWngVWDl-6" target="wSTLIWxmNJqAhWngVWDl-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="wSTLIWxmNJqAhWngVWDl-6" value="&lt;div&gt;Patients with confirmed TB diagnosis&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=11,681&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="260" y="360" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="wSTLIWxmNJqAhWngVWDl-8" value="&lt;div&gt;Patients whose TB diagnosis changed&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=406&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="480" y="310" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="wSTLIWxmNJqAhWngVWDl-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" target="wSTLIWxmNJqAhWngVWDl-11">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="320" y="420" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="320" y="440" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wSTLIWxmNJqAhWngVWDl-11" value="&lt;div&gt;Patients without two healthcare encounter at baseline&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=1,558&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="480" y="410" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="wSTLIWxmNJqAhWngVWDl-13" value="&lt;div&gt;Patients with sufficient baseline information&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=10,123&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="260" y="460" width="120" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
