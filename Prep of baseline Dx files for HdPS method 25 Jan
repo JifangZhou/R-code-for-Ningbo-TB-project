@@ -1,0 +1,51 @@
+#Add baseline Dx information
+library(tidyverse)
+library(readxl)
+library(dplyr)
+library(lubridate)
+library(doBy)
+library(plyr)
+library(readr)     
+library(frequency)   
+library(DescTools)
+library(purrr)
+Sys.setenv(JAVA_HOME='C:\\Program Files\\Java\\jre1.8.0_261\\jre')
+library(rJava)
+library(xlsx)
+library(lubridate)
+library(dostats)
+
+
+#Lab cleaning and finding valid results in ALT ALP Tbil and INR
+setwd("E:/Ningbo Projects/TB/TB project/Workingd/CSV files/")
+
+IPT<-read_csv("IPT.csv")
+OPT<-read_csv("OPT.csv")
+
+df1<-separate(IPT, c("icd"), into=c("icd1","icd2","icd3","icd4","icd5","icd6","icd7","icd8","icd9","icd10"), sep = ",", remove = FALSE, convert = FALSE, extra = "warn", fill = "warn")
+df2<-separate(OPT, c("icd"), into=c("icd1","icd2","icd3","icd4","icd5","icd6","icd7","icd8","icd9","icd10"), sep = ",", remove = FALSE, convert = FALSE, extra = "warn", fill = "warn")
+
+id_list<-read_csv("id_list_hepatoprotective_0125_final.csv",
+                  col_types = cols(
+                    Hepaence_pre_dx_date = col_date(),
+                    Hepaence_post_dx_date = col_date(),
+                    Tbil_abn_pre_date = col_date(),
+                    ALP_abn_pre_date = col_date(),
+                    Tbil_abn_pre_date = col_date(),
+                    ALP_10N_post_date = col_date(),
+                    ALP_10N_post_date = col_date()
+                  ))
+id_list_index<-id_list %>% select(idcard,  Dx_date, )
+
+
+IPT <- inner_join(df1,id_list_index,  by = "idcard") 
+OPT <- inner_join(df2,id_list_index,  by = "idcard") 
+
+IPT_baseline<-IPT[IPT$adm_time<IPT$Dx_date & IPT$adm_time>=IPT$Dx_date-365 ,]
+OPT_baseline<-OPT[OPT$clinic_time<OPT$Dx_date & OPT$clinic_time>=OPT$Dx_date-365 ,]
+
+IPT_baseline_dx <- IPT_baseline %>% select("idcard", "icd1","icd2","icd3","icd4","icd5","icd6","icd7","icd8","icd9","icd10")
+OPT_baseline_dx <- OPT_baseline %>% select("idcard", "icd1","icd2","icd3","icd4","icd5","icd6","icd7","icd8","icd9","icd10")
+
+write_excel_csv(IPT_baseline_dx,"IPT_baseline_dx.csv")
+write_excel_csv(OPT_baseline_dx,"OPT_baseline_dx.csv")
