@@ -1,49 +1,49 @@
-<mxfile host="app.diagrams.net" modified="2021-01-25T03:46:32.240Z" agent="5.0 (Windows)" etag="ZxNAQ9MgjqqtTnm9BRYL" version="13.9.1" type="github">
+<mxfile host="app.diagrams.net" modified="2021-01-25T04:57:24.621Z" agent="5.0 (Windows)" etag="3J5yy354f6CKjUPsygcA" version="13.9.1" type="github">
   <diagram id="uHvE_O8O9B5TAk8AYGmk" name="Page-1">
     <mxGraphModel dx="582" dy="1643" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="o0szKlHt9puFOY36pzJz-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="o0szKlHt9puFOY36pzJz-2">
+        <mxCell id="o0szKlHt9puFOY36pzJz-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="o0szKlHt9puFOY36pzJz-2" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="280" y="140" as="targetPoint" />
             <mxPoint x="140" y="120" as="sourcePoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-2" value="&lt;div&gt;Patients with TB extracted from EHR&lt;/div&gt;&lt;div&gt;N=19,916&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+        <mxCell id="o0szKlHt9puFOY36pzJz-2" value="&lt;div&gt;Patients with TB extracted from EHR&lt;/div&gt;&lt;div&gt;N=19,916&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
           <mxGeometry x="80" y="40" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="o0szKlHt9puFOY36pzJz-4">
+        <mxCell id="o0szKlHt9puFOY36pzJz-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="o0szKlHt9puFOY36pzJz-4" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="280" y="140" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-4" value="&lt;div&gt;Patients with TB from CDC registries&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=12,174&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+        <mxCell id="o0szKlHt9puFOY36pzJz-4" value="&lt;div&gt;Patients with TB from CDC registries&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=12,174&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
           <mxGeometry x="360" y="40" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="o0szKlHt9puFOY36pzJz-7" target="o0szKlHt9puFOY36pzJz-9">
+        <mxCell id="o0szKlHt9puFOY36pzJz-5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="o0szKlHt9puFOY36pzJz-7" target="o0szKlHt9puFOY36pzJz-9" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="o0szKlHt9puFOY36pzJz-7" target="o0szKlHt9puFOY36pzJz-10">
+        <mxCell id="o0szKlHt9puFOY36pzJz-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="o0szKlHt9puFOY36pzJz-7" target="o0szKlHt9puFOY36pzJz-10" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="280" y="220" />
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-7" value="&lt;div&gt;Patients linked with both data sources&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=12,087&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+        <mxCell id="o0szKlHt9puFOY36pzJz-7" value="&lt;div&gt;Patients linked with both data sources&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=12,087&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
           <mxGeometry x="220" y="140" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="o0szKlHt9puFOY36pzJz-9" target="o0szKlHt9puFOY36pzJz-14">
+        <mxCell id="o0szKlHt9puFOY36pzJz-8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="o0szKlHt9puFOY36pzJz-9" target="o0szKlHt9puFOY36pzJz-14" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-9" value="&lt;div&gt;Patients with confirmed TB diagnosis&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=11,681&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+        <mxCell id="o0szKlHt9puFOY36pzJz-9" value="&lt;div&gt;Patients with confirmed TB diagnosis&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=11,681&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
           <mxGeometry x="220" y="240" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-10" value="&lt;div&gt;Patients whose TB diagnosis changed&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=406&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+        <mxCell id="o0szKlHt9puFOY36pzJz-10" value="&lt;div&gt;Patients whose TB diagnosis changed&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=406&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
           <mxGeometry x="440" y="190" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" target="o0szKlHt9puFOY36pzJz-12">
+        <mxCell id="o0szKlHt9puFOY36pzJz-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" target="o0szKlHt9puFOY36pzJz-12" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="280" y="300" as="sourcePoint" />
             <Array as="points">
@@ -51,16 +51,16 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-12" value="&lt;div&gt;Patients without two healthcare encounter at baseline&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=1,558&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+        <mxCell id="o0szKlHt9puFOY36pzJz-12" value="&lt;div&gt;Patients without two healthcare encounter at baseline&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=1,558&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
           <mxGeometry x="440" y="290" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-13" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="o0szKlHt9puFOY36pzJz-14" target="o0szKlHt9puFOY36pzJz-18">
+        <mxCell id="o0szKlHt9puFOY36pzJz-13" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="o0szKlHt9puFOY36pzJz-14" target="o0szKlHt9puFOY36pzJz-18" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-14" value="&lt;div&gt;Patients with sufficient baseline information&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=10,123&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+        <mxCell id="o0szKlHt9puFOY36pzJz-14" value="&lt;div&gt;Patients with sufficient baseline information&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=10,123&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
           <mxGeometry x="220" y="340" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" target="o0szKlHt9puFOY36pzJz-16">
+        <mxCell id="o0szKlHt9puFOY36pzJz-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" target="o0szKlHt9puFOY36pzJz-16" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="280" y="400" as="sourcePoint" />
             <Array as="points">
@@ -68,16 +68,16 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-16" value="&lt;div&gt;Patients at least one healthcare encounter during follow-up&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=182&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+        <mxCell id="o0szKlHt9puFOY36pzJz-16" value="&lt;div&gt;Patients at least one healthcare encounter during follow-up&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=182&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
           <mxGeometry x="440" y="390" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-17" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="o0szKlHt9puFOY36pzJz-18" target="o0szKlHt9puFOY36pzJz-22">
+        <mxCell id="o0szKlHt9puFOY36pzJz-17" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="o0szKlHt9puFOY36pzJz-18" target="o0szKlHt9puFOY36pzJz-22" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-18" value="&lt;div&gt;Patients with sufficient baseline information&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=9,941&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+        <mxCell id="o0szKlHt9puFOY36pzJz-18" value="&lt;div&gt;Patients with sufficient baseline information&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=9,941&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
           <mxGeometry x="220" y="440" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" target="o0szKlHt9puFOY36pzJz-20">
+        <mxCell id="o0szKlHt9puFOY36pzJz-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" target="o0szKlHt9puFOY36pzJz-20" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="280" y="500" as="sourcePoint" />
             <Array as="points">
@@ -85,25 +85,25 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-20" value="&lt;div&gt;Patients above 18 years old at TB diagnosis&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=139&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+        <mxCell id="o0szKlHt9puFOY36pzJz-20" value="&lt;div&gt;Patients above 18 years old at TB diagnosis&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=139&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
           <mxGeometry x="440" y="490" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-21" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="o0szKlHt9puFOY36pzJz-22" target="o0szKlHt9puFOY36pzJz-25">
+        <mxCell id="o0szKlHt9puFOY36pzJz-21" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="o0szKlHt9puFOY36pzJz-22" target="o0szKlHt9puFOY36pzJz-25" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-22" value="&lt;div&gt;Patients with sufficient baseline information&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=9,802&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+        <mxCell id="o0szKlHt9puFOY36pzJz-22" value="&lt;div&gt;Patients with sufficient baseline information&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=9,802&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
           <mxGeometry x="220" y="540" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-23" value="&lt;div&gt;Patients with pregnancy during TB treatment&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=151&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+        <mxCell id="o0szKlHt9puFOY36pzJz-23" value="&lt;div&gt;Patients with pregnancy during TB treatment&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=151&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
           <mxGeometry x="440" y="590" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-31" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="o0szKlHt9puFOY36pzJz-25" target="o0szKlHt9puFOY36pzJz-30">
+        <mxCell id="o0szKlHt9puFOY36pzJz-31" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="o0szKlHt9puFOY36pzJz-25" target="o0szKlHt9puFOY36pzJz-30" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-25" value="&lt;div&gt;Eligible patients in analytic dataset&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=9,651&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+        <mxCell id="o0szKlHt9puFOY36pzJz-25" value="&lt;div&gt;Eligible patients in analytic dataset&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=9,651&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
           <mxGeometry x="220" y="640" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1">
+        <mxCell id="o0szKlHt9puFOY36pzJz-27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="280" y="600" as="sourcePoint" />
             <Array as="points">
@@ -112,16 +112,16 @@
             <mxPoint x="440" y="620" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-37" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="o0szKlHt9puFOY36pzJz-30" target="o0szKlHt9puFOY36pzJz-36">
+        <mxCell id="o0szKlHt9puFOY36pzJz-37" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="o0szKlHt9puFOY36pzJz-30" target="o0szKlHt9puFOY36pzJz-36" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-30" value="&lt;div&gt;Eligible patients in analytic dataset&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=8,932&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+        <mxCell id="o0szKlHt9puFOY36pzJz-30" value="&lt;div&gt;Eligible patients in analytic dataset&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=8,932&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
           <mxGeometry x="220" y="740" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-32" value="&lt;div&gt;Patients with baseline liver diseases&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=151&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+        <mxCell id="o0szKlHt9puFOY36pzJz-32" value="&lt;div&gt;Patients with baseline liver diseases&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=151&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
           <mxGeometry x="440" y="690" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-33" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1">
+        <mxCell id="o0szKlHt9puFOY36pzJz-33" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="280" y="700" as="sourcePoint" />
             <Array as="points">
@@ -130,10 +130,10 @@
             <mxPoint x="440" y="720" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-34" value="&lt;div&gt;Patients with baseline liver diseases&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=562&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+        <mxCell id="o0szKlHt9puFOY36pzJz-34" value="&lt;div&gt;Patients with baseline liver diseases&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=562&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
           <mxGeometry x="440" y="690" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-35" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1">
+        <mxCell id="o0szKlHt9puFOY36pzJz-35" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="280" y="700" as="sourcePoint" />
             <Array as="points">
@@ -142,16 +142,22 @@
             <mxPoint x="440" y="720" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-43" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="o0szKlHt9puFOY36pzJz-36" target="o0szKlHt9puFOY36pzJz-42">
+        <mxCell id="o0szKlHt9puFOY36pzJz-43" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" target="o0szKlHt9puFOY36pzJz-42" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="280" y="990" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="280" y="1020" />
+              <mxPoint x="130" y="1020" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="JQ605SI2x8LaLIvw7eop-5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="o0szKlHt9puFOY36pzJz-36" target="JQ605SI2x8LaLIvw7eop-4">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-36" value="&lt;div&gt;Eligible patients in analytic dataset&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=7,264&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+        <mxCell id="o0szKlHt9puFOY36pzJz-36" value="&lt;div&gt;Eligible patients in analytic dataset&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=7,264&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
           <mxGeometry x="220" y="840" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-38" value="&lt;div align=&quot;left&quot;&gt;&lt;ol&gt;&lt;li&gt;DILI&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; N=1497&lt;/li&gt;&lt;ol&gt;&lt;li&gt;Grade 1: N=713&lt;/li&gt;&lt;li&gt;Grade 2: N=39&lt;/li&gt;&lt;li&gt;Grade 3: N=9&lt;/li&gt;&lt;li&gt;Grade 4: N=9&lt;/li&gt;&lt;li&gt;Grade 5: N=1&lt;/li&gt;&lt;li&gt;Grade undetermined: N=726&lt;br&gt;&lt;/li&gt;&lt;/ol&gt;&lt;li&gt;Death without DILI N=267&lt;/li&gt;&lt;li&gt;Lost to follow-up N=8054&lt;br&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
-          <mxGeometry x="440" y="890" width="250" height="140" as="geometry" />
-        </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-39" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1">
+        <mxCell id="o0szKlHt9puFOY36pzJz-39" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="280" y="800" as="sourcePoint" />
             <Array as="points">
@@ -160,10 +166,41 @@
             <mxPoint x="440" y="820" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-40" value="&lt;div&gt;Patients with abnormal liver function results&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=1,668&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+        <mxCell id="o0szKlHt9puFOY36pzJz-40" value="&lt;div&gt;Patients with abnormal liver function results&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=1,668&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
           <mxGeometry x="440" y="790" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-41" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1">
+        <mxCell id="o0szKlHt9puFOY36pzJz-41" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" edge="1" target="JQ605SI2x8LaLIvw7eop-1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="280" y="1000" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="280" y="1020" />
+              <mxPoint x="430" y="1020" />
+            </Array>
+            <mxPoint x="440" y="1020" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="JQ605SI2x8LaLIvw7eop-3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="o0szKlHt9puFOY36pzJz-42" target="JQ605SI2x8LaLIvw7eop-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="o0szKlHt9puFOY36pzJz-42" value="&lt;div&gt;Exposed to liver protective agents&lt;/div&gt;&lt;div&gt;N=2,886&lt;/div&gt;&lt;div&gt;(Exposed group)&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="70" y="1060" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="JQ605SI2x8LaLIvw7eop-9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="JQ605SI2x8LaLIvw7eop-1" target="JQ605SI2x8LaLIvw7eop-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JQ605SI2x8LaLIvw7eop-1" value="&lt;div&gt;Unexposed to liver protective agnets&lt;/div&gt;&lt;div&gt;N=3,857&lt;/div&gt;&lt;div&gt;(Reference group)&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="370" y="1060" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="JQ605SI2x8LaLIvw7eop-11" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="JQ605SI2x8LaLIvw7eop-2" target="JQ605SI2x8LaLIvw7eop-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JQ605SI2x8LaLIvw7eop-2" value="&lt;div align=&quot;left&quot;&gt;1. Cured N=833 (28.9%)&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;2. Treatment completed N= 1634 (56.6%)&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;3. ADR N=11 (0.4%)&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;4. Lost to follow-up N=287 (9.9%)&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;5. MDR-TB N=33 (1.3%)&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;6. TB-related death N=11 (0.4%)&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;7. Non-TB related death N=38 (1.3%)&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;8. Treatment failure N=39 (1.4%)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="20" y="1150" width="220" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="JQ605SI2x8LaLIvw7eop-4" value="&lt;div&gt;Eligible patients in analytic dataset&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=6,743&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="220" y="940" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="JQ605SI2x8LaLIvw7eop-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="280" y="900" as="sourcePoint" />
             <Array as="points">
@@ -172,8 +209,20 @@
             <mxPoint x="440" y="920" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="o0szKlHt9puFOY36pzJz-42" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
-          <mxGeometry x="220" y="940" width="120" height="60" as="geometry" />
+        <mxCell id="JQ605SI2x8LaLIvw7eop-7" value="&lt;div&gt;Patients exposed to liver protective agent during wash-out period (-365 day ~-31 day pre-index)&lt;br&gt;&lt;/div&gt;&lt;div&gt;N=521&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="440" y="870" width="120" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="JQ605SI2x8LaLIvw7eop-13" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="JQ605SI2x8LaLIvw7eop-8" target="JQ605SI2x8LaLIvw7eop-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JQ605SI2x8LaLIvw7eop-8" value="&lt;div align=&quot;left&quot;&gt;1. Cured N=1190 (30.9%)&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;2. Treatment completed N= 2102 (54.5%)&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;3. ADR N=11 (0.3%)&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;4. Lost to follow-up N=375 (9.7%)&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;5. MDR-TB N=41 (1.1%)&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;6. TB-related death N=14 (0.6%)&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;7. Non-TB related death N=51 (1.3%)&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;8. Treatment failure N=73 (1.9%)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="320" y="1150" width="220" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="JQ605SI2x8LaLIvw7eop-10" value="&lt;div align=&quot;left&quot;&gt;&lt;ol&gt;&lt;li&gt;DILI&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; N=376&lt;/li&gt;&lt;ol&gt;&lt;li&gt;Grade 1: N=208&lt;/li&gt;&lt;li&gt;Grade 2: N=5&lt;/li&gt;&lt;li&gt;Grade 3: N=0&lt;/li&gt;&lt;li&gt;Grade 4: N=2&lt;/li&gt;&lt;li&gt;Grade 5: N=0&lt;/li&gt;&lt;li&gt;Grade undetermined: N=161&lt;br&gt;&lt;/li&gt;&lt;/ol&gt;&lt;li&gt;Death without DILI N=47&lt;/li&gt;&lt;li&gt;Lost to follow-up N=2463&lt;/li&gt;&lt;/ol&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="20" y="1320" width="220" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="JQ605SI2x8LaLIvw7eop-12" value="&lt;div align=&quot;left&quot;&gt;&lt;ol&gt;&lt;li&gt;DILI&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; N=405&lt;/li&gt;&lt;ol&gt;&lt;li&gt;Grade 1: N=195&lt;/li&gt;&lt;li&gt;Grade 2: N=7&lt;/li&gt;&lt;li&gt;Grade 3: N=3&lt;/li&gt;&lt;li&gt;Grade 4: N=2&lt;/li&gt;&lt;li&gt;Grade 5: N=0&lt;/li&gt;&lt;li&gt;Grade undetermined: N=198&lt;br&gt;&lt;/li&gt;&lt;/ol&gt;&lt;li&gt;Death without DILI N=64&lt;/li&gt;&lt;li&gt;Lost to follow-up N=3388&lt;/li&gt;&lt;/ol&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;align=left;" vertex="1" parent="1">
+          <mxGeometry x="320" y="1320" width="220" height="150" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
