@@ -1,0 +1,302 @@
+#Add pregnancy information and drug information
+library(tidyverse)
+library(readxl)
+library(dplyr)
+library(lubridate)
+library(doBy)
+library(plyr)
+library(readr)     
+library(frequency)   
+library(DescTools)
+library(purrr)
+Sys.setenv(JAVA_HOME='C:\\Program Files\\Java\\jre1.8.0_261\\jre')
+library(rJava)
+library(xlsx)
+library(lubridate)
+library(dostats)
+
+
+#Lab cleaning and finding valid results in ALT ALP Tbil and INR
+setwd("E:/Ningbo Projects/TB/TB project/Workingd/CSV files/")
+
+IPT<-read_csv("IPT.csv")
+OPT<-read_csv("OPT.csv")
+IPT_pharm<-read_csv("IPT_pharm.csv")
+OPT_pharm<-read_csv("OPT_pharm.csv")
+
+id_list<-read_csv("id_list_0117_final.csv",
+                  col_types = cols(
+                    Hepaence_pre_dx_date = col_date(),
+                    Hepaence_post_dx_date = col_date()
+                  ))
+id_list_index<-id_list %>% select(idcard,  Dx_date, )
+
+
+Case_OPT_pharm<-filter(OPT_pharm, (grepl("孕",disease_name) & grepl("周",disease_name)) | 
+                         grepl("妊娠",disease_name) |
+                         grepl("孕晚期",disease_name) |
+                         grepl("孕产妇",disease_name)|
+                         grepl("临产",disease_name)|
+                         grepl("流产",disease_name)|
+                         grepl("产前",disease_name)|
+                         grepl("产后",disease_name))
+Case_OPT_pharm$Case_time<-Case_OPT_pharm$clinic_time
+
+Case_OPT<-filter(OPT,  (grepl("孕",disease_name) & grepl("周",disease_name)) | 
+                   grepl("妊娠",disease_name) |
+                   grepl("孕晚期",disease_name) |
+                   grepl("孕产妇",disease_name)|
+                   grepl("临产",disease_name)|
+                   grepl("流产",disease_name)|
+                   grepl("产前",disease_name)|
+                   grepl("产后",disease_name))
+Case_OPT$Case_time<-Case_OPT$clinic_time
+
+Case_IPT<-filter(IPT, (grepl("孕",disease_name) & grepl("周",disease_name)) | 
+                   grepl("妊娠",disease_name) |
+                   grepl("孕晚期",disease_name) |
+                   grepl("孕产妇",disease_name)|
+                   grepl("临产",disease_name)|
+                   grepl("流产",disease_name)|
+                   grepl("产前",disease_name)|
+                   grepl("产后",disease_name))
+Case_IPT$Case_time<-Case_IPT$dis_time
+
+Case_OPT_pharm <- Case_OPT_pharm %>% select(idcard,  Case_time)
+Case_OPT <- Case_OPT %>% select(idcard,  Case_time)
+Case_IPT <- Case_IPT %>% select(idcard,  Case_time)
+
+Case_OPT_pharm$Case_type  <- "OPT_pharm"
+Case_OPT$Case_type        <- "OPT"
+Case_IPT$Case_type        <- "IPT"
+
+Case_all<-rbind(Case_OPT_pharm,Case_OPT,Case_IPT)
+
+Case_all_index <- inner_join(Case_all,id_list_index,  by = "idcard") 
+
+by_species <- Case_all_index %>%  group_by(idcard)
+unique_pregnancy_id_all<-by_species %>%  summarise_all(list(min,max))
+unique_pregnancy_id_all <- unique_pregnancy_id_all %>% select(idcard,  Case_time_fn1,  Case_time_fn2)
+colnames(unique_pregnancy_id_all)[colnames(unique_pregnancy_id_all) %in% 
+                                    c("Case_time_fn1", "Case_time_fn2")] <- c("Pregnancy_min_date", "Pregnancy_max_date")
+
+unique_pregnancy_id_all<-unique_pregnancy_id_all[!is.na(unique_pregnancy_id_all$Pregnancy_min_date) &
+                                                   !is.na(unique_pregnancy_id_all$Pregnancy_max_date), ]
+id_list1 <- left_join(id_list,  unique_pregnancy_id_all,  by = "idcard") 
+id_list1$Pregnancy_baseline<-if_else(((id_list1$Pregnancy_min_date<=id_list1$Dx_date & id_list1$Pregnancy_min_date>=id_list1$Dx_date-365) |
+                                     (id_list1$Pregnancy_max_date<=id_list1$Dx_date & id_list1$Pregnancy_max_date>=id_list1$Dx_date-365)) & id_list1$Sex.y=="女",1,0 )
+# To incorporate medication utilization information
+#Load drug files
+iptdrugbook<-read_xlsx("iptdrugbook.xlsx")
+optdrugbook<-read_xlsx("optdrugbook.xlsx")
+colnames(iptdrugbook)[colnames(iptdrugbook) %in% c("level")] <- c("item_name")
+colnames(optdrugbook)[colnames(optdrugbook) %in% c("level")] <- c("item_name")
+ipt_drug_index<-inner_join(IPT_pharm,iptdrugbook, by = "item_name") 
+opt_drug_index<-inner_join(OPT_pharm,optdrugbook, by = "item_name") 
+
+#Select only exposed in -30 to day 0 period
+id_list_index<-id_list %>% select(idcard, Dx_date)
+ipt_drug_index<-inner_join(ipt_drug_index,id_list_index, by = "idcard") 
+opt_drug_index<-inner_join(opt_drug_index,id_list_index, by = "idcard") 
+
+ipt_drug_index_baseline_30<-ipt_drug_index[ipt_drug_index$intake_start_time<=ipt_drug_index$Dx_date-30,]
+opt_drug_index_baseline_30<-opt_drug_index[opt_drug_index$clinic_time<=opt_drug_index$Dx_date-30,]
+
+ipt_drug_index_ini_30<-ipt_drug_index[ipt_drug_index$intake_start_time>ipt_drug_index$Dx_date-30 & ipt_drug_index$intake_start_time<=ipt_drug_index$Dx_date,]
+opt_drug_index_ini_30<-opt_drug_index[opt_drug_index$clinic_time>opt_drug_index$Dx_date-30 &opt_drug_index$clinic_time<=opt_drug_index$Dx_date,]
+
+ipt_hepato_baseline_30<-ipt_drug_index_baseline_30[ipt_drug_index_baseline_30$Cat=="Hepato",]
+opt_hepato_baseline_30<-opt_drug_index_baseline_30[opt_drug_index_baseline_30$Cat=="Hepato",]
+
+ipt_hepato_ini_30<-ipt_drug_index_ini_30[ipt_drug_index_ini_30$Cat=="Hepato",]
+opt_hepato_ini_30<-opt_drug_index_ini_30[opt_drug_index_ini_30$Cat=="Hepato",]
+
+#Extract id_list and then merge to main analytic table
+ipt_hepato_baseline_30<-ipt_hepato_baseline_30 %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(intake_start_time), max, na.rm = TRUE)
+opt_hepato_baseline_30<-opt_hepato_baseline_30 %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(clinic_time), max, na.rm = TRUE)
+
+ipt_hepato_ini_30<-ipt_hepato_ini_30 %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(intake_start_time), min, na.rm = TRUE)
+opt_hepato_ini_30<-opt_hepato_ini_30 %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(clinic_time), min, na.rm = TRUE)
+
+colnames(ipt_hepato_baseline_30)[colnames(ipt_hepato_baseline_30) %in% c("intake_start_time")] <- c("Hepato_ipt_baseline_date")
+colnames(opt_hepato_baseline_30)[colnames(opt_hepato_baseline_30) %in% c("clinic_time")] <- c("Hepato_opt_baseline_date")
+colnames(ipt_hepato_ini_30)[colnames(ipt_hepato_ini_30) %in% c("intake_start_time")] <- c("Hepato_ipt_ini_date")
+colnames(opt_hepato_ini_30)[colnames(opt_hepato_ini_30) %in% c("clinic_time")] <- c("Hepato_opt_ini_date")
+
+id_list1 <- left_join(id_list1,  ipt_hepato_baseline_30, by = "idcard") 
+id_list2 <- left_join(id_list1, opt_hepato_baseline_30, by = "idcard") 
+id_list3 <- left_join(id_list2, ipt_hepato_ini_30, by = "idcard") 
+id_list4 <- left_join(id_list3, opt_hepato_ini_30, by = "idcard") 
+
+id_list4$baseline_hepato[!is.na(id_list4$Hepato_ipt_baseline_date) | !is.na(id_list4$Hepato_opt_baseline_date)]<-1
+id_list4$baseline_hepato[is.na(id_list4$baseline_hepato)]<-0
+
+id_list4$ini_hepato[!is.na(id_list4$Hepato_ipt_ini_date) | !is.na(id_list4$Hepato_opt_ini_date)]<-1
+id_list4$ini_hepato[is.na(id_list4$ini_hepato)]<-0
+
+#Co-exposure of TCM or herbal drugs within -30day window
+ipt_drug_30_cat<-ipt_drug_index_ini_30 %>% select(idcard,  Cat,)
+opt_drug_30_cat<-opt_drug_index_ini_30 %>% select(idcard,  Cat,)
+Drug_ini_30<-rbind(ipt_drug_30_cat,opt_drug_30_cat)
+
+TCM_ini_30<-Drug_ini_30[Drug_ini_30$Cat=="TCM",]
+unique_TCM_id<-TCM_ini_30 %>%  group_by(idcard)
+unique_TCM_id<-unique_TCM_id %>%
+  distinct(idcard, .keep_all = TRUE)
+unique_TCM_id$Co_TCM_ini_30<-1
+unique_TCM_id<-unique_TCM_id %>% select(idcard,  Co_TCM_ini_30,)
+
+Yinpian_ini_30<-Drug_ini_30[Drug_ini_30$Cat=="Yinpian",]
+unique_Yinpian_id<-Yinpian_ini_30 %>%  group_by(idcard)
+unique_Yinpian_id<-unique_Yinpian_id %>%
+  distinct(idcard, .keep_all = TRUE)
+unique_Yinpian_id$Co_Yinpian_ini_30<-1
+unique_Yinpian_id<-unique_Yinpian_id %>% select(idcard,  Co_Yinpian_ini_30,)
+
+id_list5 <- left_join(id_list4, unique_TCM_id, by = "idcard") 
+id_list6 <- left_join(id_list5, unique_Yinpian_id, by = "idcard") 
+
+#Select all hepato drug during initiation window and assess the types
+ipt_drug_index<-inner_join(ipt_drug_index,id_list_index, by = "idcard") 
+opt_drug_index<-inner_join(opt_drug_index,id_list_index, by = "idcard") 
+
+ipt_drug_index_ini_30<-ipt_drug_index[ipt_drug_index$intake_start_time>ipt_drug_index$Dx_date-30 & ipt_drug_index$intake_start_time<=ipt_drug_index$Dx_date,]
+opt_drug_index_ini_30<-opt_drug_index[opt_drug_index$clinic_time>opt_drug_index$Dx_date-30 &opt_drug_index$clinic_time<=opt_drug_index$Dx_date,]
+
+ipt_hepato_ini_30<-ipt_drug_index_ini_30[ipt_drug_index_ini_30$Cat=="Hepato",]
+opt_hepato_ini_30<-opt_drug_index_ini_30[opt_drug_index_ini_30$Cat=="Hepato",]
+ipt_hepato_ini_30<-ipt_hepato_ini_30 %>% select(idcard,  item_name,)
+opt_hepato_ini_30<-opt_hepato_ini_30 %>% select(idcard,  item_name,)
+hepato_ini_30<-rbind(ipt_hepato_ini_30,opt_hepato_ini_30)
+
+
+hepato_ini_30$Hepato_cat[grepl("甘草酸苷",hepato_ini_30$item_name)]<-"甘草酸苷"
+hepato_ini_30$Hepato_cat[grepl("护肝",hepato_ini_30$item_name)]<-"护肝"
+hepato_ini_30$Hepato_cat[grepl("水飞蓟",hepato_ini_30$item_name)]<-"水飞蓟"
+hepato_ini_30$Hepato_cat[grepl("五酯",hepato_ini_30$item_name)]<-"五酯"
+hepato_ini_30$Hepato_cat[grepl("多烯磷脂酰胆碱",hepato_ini_30$item_name)|
+                           grepl("易善复",hepato_ini_30$item_name)]<-"多烯磷脂酰胆碱"
+hepato_ini_30$Hepato_cat[grepl("异甘草酸",hepato_ini_30$item_name)]<-"异甘草酸"
+hepato_ini_30$Hepato_cat[grepl("天晴甘平",hepato_ini_30$item_name) |
+                           grepl("甘草酸二铵",hepato_ini_30$item_name)]<-"甘草酸二铵"
+hepato_ini_30$Hepato_cat[grepl("复方牛胎肝提取物",hepato_ini_30$item_name)]<-"复方牛胎肝提取物"
+hepato_ini_30$Hepato_cat[grepl("叶绿素铜钠",hepato_ini_30$item_name)]<-"叶绿素铜钠"
+hepato_ini_30$Hepato_cat[grepl("强肝",hepato_ini_30$item_name)]<-"强肝"
+hepato_ini_30$Hepato_cat[grepl("当飞利肝宁",hepato_ini_30$item_name)]<-"当飞利肝宁"
+hepato_ini_30$Hepato_cat[grepl("熊去氧胆酸",hepato_ini_30$item_name)]<-"熊去氧胆酸"
+
+hepato_ini_30<-hepato_ini_30 %>% select(idcard,  Hepato_cat,)
+
+hepato_ini_30_stat<-hepato_ini_30 %>%
+  group_by(idcard,Hepato_cat)%>%
+  count()
+
+hepato_list<-hepato_ini_30_stat[hepato_ini_30_stat$Hepato_cat=="甘草酸苷",]
+hepato_list<-hepato_list %>% select(idcard,  freq,)
+colnames(hepato_list)[colnames(hepato_list) %in% c("freq")] <- c("甘草酸苷_freq")
+id_list6 <- left_join(id_list6, hepato_list, by = "idcard") 
+id_list6$'甘草酸苷_freq'[is.na(id_list6$'甘草酸苷_freq')]<-0
+
+hepato_list<-hepato_ini_30_stat[hepato_ini_30_stat$Hepato_cat=="五酯",]
+hepato_list<-hepato_list %>% select(idcard,  freq,)
+colnames(hepato_list)[colnames(hepato_list) %in% c("freq")] <- c("五酯_freq")
+id_list6 <- left_join(id_list6, hepato_list, by = "idcard") 
+id_list6$'五酯_freq'[is.na(id_list6$'五酯_freq')]<-0
+
+hepato_list<-hepato_ini_30_stat[hepato_ini_30_stat$Hepato_cat=="叶绿素铜钠",]
+hepato_list<-hepato_list %>% select(idcard,  freq,)
+colnames(hepato_list)[colnames(hepato_list) %in% c("freq")] <- c("叶绿素铜钠_freq")
+id_list6 <- left_join(id_list6, hepato_list, by = "idcard") 
+id_list6$'叶绿素铜钠_freq'[is.na(id_list6$'叶绿素铜钠_freq')]<-0
+
+hepato_list<-hepato_ini_30_stat[hepato_ini_30_stat$Hepato_cat=="复方牛胎肝提取物",]
+hepato_list<-hepato_list %>% select(idcard,  freq,)
+colnames(hepato_list)[colnames(hepato_list) %in% c("freq")] <- c("复方牛胎肝提取物_freq")
+id_list6 <- left_join(id_list6, hepato_list, by = "idcard") 
+id_list6$'复方牛胎肝提取物_freq'[is.na(id_list6$'复方牛胎肝提取物_freq')]<-0
+
+hepato_list<-hepato_ini_30_stat[hepato_ini_30_stat$Hepato_cat=="多烯磷脂酰胆碱",]
+hepato_list<-hepato_list %>% select(idcard,  freq,)
+colnames(hepato_list)[colnames(hepato_list) %in% c("freq")] <- c("多烯磷脂酰胆碱_freq")
+id_list6 <- left_join(id_list6, hepato_list, by = "idcard") 
+id_list6$'多烯磷脂酰胆碱_freq'[is.na(id_list6$'多烯磷脂酰胆碱_freq')]<-0
+
+hepato_list<-hepato_ini_30_stat[hepato_ini_30_stat$Hepato_cat=="异甘草酸",]
+hepato_list<-hepato_list %>% select(idcard,  freq,)
+colnames(hepato_list)[colnames(hepato_list) %in% c("freq")] <- c("异甘草酸_freq")
+id_list6 <- left_join(id_list6, hepato_list, by = "idcard") 
+id_list6$'异甘草酸_freq'[is.na(id_list6$'异甘草酸_freq')]<-0
+
+hepato_list<-hepato_ini_30_stat[hepato_ini_30_stat$Hepato_cat=="强肝",]
+hepato_list<-hepato_list %>% select(idcard,  freq,)
+colnames(hepato_list)[colnames(hepato_list) %in% c("freq")] <- c("强肝_freq")
+id_list6 <- left_join(id_list6, hepato_list, by = "idcard") 
+id_list6$'强肝_freq'[is.na(id_list6$'强肝_freq')]<-0
+
+hepato_list<-hepato_ini_30_stat[hepato_ini_30_stat$Hepato_cat=="当飞利肝宁",]
+hepato_list<-hepato_list %>% select(idcard,  freq,)
+colnames(hepato_list)[colnames(hepato_list) %in% c("freq")] <- c("当飞利肝宁_freq")
+id_list6 <- left_join(id_list6, hepato_list, by = "idcard") 
+id_list6$'当飞利肝宁_freq'[is.na(id_list6$'当飞利肝宁_freq')]<-0
+
+hepato_list<-hepato_ini_30_stat[hepato_ini_30_stat$Hepato_cat=="护肝",]
+hepato_list<-hepato_list %>% select(idcard,  freq,)
+colnames(hepato_list)[colnames(hepato_list) %in% c("freq")] <- c("护肝_freq")
+id_list6 <- left_join(id_list6, hepato_list, by = "idcard") 
+id_list6$'护肝_freq'[is.na(id_list6$'护肝_freq')]<-0
+
+hepato_list<-hepato_ini_30_stat[hepato_ini_30_stat$Hepato_cat=="水飞蓟",]
+hepato_list<-hepato_list %>% select(idcard,  freq,)
+colnames(hepato_list)[colnames(hepato_list) %in% c("freq")] <- c("水飞蓟_freq")
+id_list6 <- left_join(id_list6, hepato_list, by = "idcard") 
+id_list6$'水飞蓟_freq'[is.na(id_list6$'水飞蓟_freq')]<-0
+
+hepato_list<-hepato_ini_30_stat[hepato_ini_30_stat$Hepato_cat=="熊去氧胆酸",]
+hepato_list<-hepato_list %>% select(idcard,  freq,)
+colnames(hepato_list)[colnames(hepato_list) %in% c("freq")] <- c("熊去氧胆酸_freq")
+id_list6 <- left_join(id_list6, hepato_list, by = "idcard") 
+id_list6$'熊去氧胆酸_freq'[is.na(id_list6$'熊去氧胆酸_freq')]<-0
+
+hepato_list<-hepato_ini_30_stat[hepato_ini_30_stat$Hepato_cat=="甘草酸二铵",]
+hepato_list<-hepato_list %>% select(idcard,  freq,)
+colnames(hepato_list)[colnames(hepato_list) %in% c("freq")] <- c("甘草酸二铵_freq")
+id_list6 <- left_join(id_list6, hepato_list, by = "idcard") 
+id_list6$'甘草酸二铵_freq'[is.na(id_list6$'甘草酸二铵_freq')]<-0
+
+id_list6$'五酯_ini_status'<-if_else(id_list6$'五酯_freq'>0, 1,0)
+id_list6$'叶绿素铜钠_ini_status'<-if_else(id_list6$'叶绿素铜钠_freq'>0, 1,0)
+id_list6$'复方牛胎肝提取物_ini_status'<-if_else(id_list6$'复方牛胎肝提取物_freq'>0, 1,0)
+id_list6$'多烯磷脂酰胆碱_ini_status'<-if_else(id_list6$'多烯磷脂酰胆碱_freq'>0, 1,0)
+id_list6$'异甘草酸_ini_status'<-if_else(id_list6$'异甘草酸_freq'>0, 1,0)
+id_list6$'强肝_ini_status'<-if_else(id_list6$'强肝_freq'>0, 1,0)
+id_list6$'当飞利肝宁_ini_status'<-if_else(id_list6$'当飞利肝宁_freq'>0, 1,0)
+id_list6$'护肝_ini_status'<-if_else(id_list6$'护肝_freq'>0, 1,0)
+id_list6$'水飞蓟_ini_status'<-if_else(id_list6$'水飞蓟_freq'>0, 1,0)
+id_list6$'熊去氧胆酸_ini_status'<-if_else(id_list6$'熊去氧胆酸_freq'>0, 1,0)
+id_list6$'甘草酸二铵_ini_status'<-if_else(id_list6$'甘草酸二铵_freq'>0, 1,0)
+id_list6$'甘草酸苷_ini_status'<-if_else(id_list6$'甘草酸苷_freq'>0, 1,0)
+
+id_list6$hepato_ini_count<-id_list6$'五酯_ini_status'+
+id_list6$'叶绿素铜钠_ini_status'+
+id_list6$'复方牛胎肝提取物_ini_status'+
+id_list6$'多烯磷脂酰胆碱_ini_status'+
+id_list6$'异甘草酸_ini_status'+
+id_list6$'强肝_ini_status'+
+id_list6$'当飞利肝宁_ini_status'+
+id_list6$'护肝_ini_status'+
+id_list6$'水飞蓟_ini_status'+
+id_list6$'熊去氧胆酸_ini_status'+
+id_list6$'甘草酸二铵_ini_status'+
+id_list6$'甘草酸苷_ini_status'
+
+table(id_list6$hepato_ini_count)
+
+write_excel_csv(id_list6,"id_list_0119.csv")
