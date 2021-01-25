@@ -1,0 +1,143 @@
+#Assessment of effectiveness of liver protective agents
+library(tidyverse)
+library(readxl)
+library(dplyr)
+library(lubridate)
+library(doBy)
+library(plyr)
+library(readr)     
+library(frequency)   
+library(DescTools)
+library(purrr)
+Sys.setenv(JAVA_HOME='C:\\Program Files\\Java\\jre1.8.0_261\\jre')
+library(rJava)
+library(xlsx)
+library(lubridate)
+library(dostats)
+
+
+#Lab cleaning and finding valid results in ALT ALP Tbil and INR
+setwd("E:/Ningbo Projects/TB/TB project/Workingd/CSV files/")
+
+IPT<-read_csv("IPT.csv")
+OPT<-read_csv("OPT.csv")
+IPT_pharm<-read_csv("IPT_pharm.csv")
+OPT_pharm<-read_csv("OPT_pharm.csv")
+
+id_list<-read_csv("id_list_0119.csv",
+                  col_types = cols(
+                    Hepaence_pre_dx_date = col_date(),
+                    Hepaence_post_dx_date = col_date()
+                  ))
+
+#Eligible patients for liver protective agents assessment
+id_list<-id_list[id_list$Rx_outcome !="Dx_changed",]
+id_list$Rx_outcome[id_list$Rx_outcome =="Other"]<-"LTF"
+
+
+id_list<-id_list[!is.na(id_list$Two_encounter_baseline),]
+
+id_list<-id_list[((!is.na(id_list$OPT_max_date) & id_list$OPT_max_date>id_list$Dx_date) | 
+                  (!is.na(id_list$max_admdate)  & id_list$max_admdate>id_list$Dx_date)) &
+                    (!is.na(id_list$OPT_max_date) |(!is.na(id_list$max_admdate) ))
+                  ,]
+
+id_list<-id_list[id_list$Age_cal>=18,]
+
+id_list$Pregnancy_baseline[is.na(id_list$Pregnancy_baseline)]<-0
+
+id_list1<-id_list[id_list$Pregnancy_baseline !=1 | is.na(id_list$Pregnancy_baseline),]
+
+
+id_list1<-id_list1[is.na(id_list1$CCI_liver==0 & 
+                     id_list1$Hx_liver_disease !=1 & 
+                     id_list1$CCI_livercomplic==0 &
+                     is.na(id_list1$Fattyliver_pre_dx_date) & 
+                     is.na(id_list1$Cirrhosis_pre_dx_date) & 
+                     is.na(id_list1$Hepaence_pre_dx_date) & 
+                     is.na(id_list1$Ascites_pre_dx_date) & 
+                     is.na(id_list1$AutoHepatitis_pre_dx_date) & 
+                     is.na(id_list1$HBV_pre_dx_date) & 
+                     is.na(id_list1$HCV_pre_dx_date) & 
+                     is.na(id_list1$Hx_HBV)),]
+
+id_list2<-id_list1[(id_list1$ALT_max_ratio_baseline<=1 | is.na(id_list1$ALT_max_ratio_baseline)) &
+                     (id_list1$ALP_max_ratio_baseline<=1 | is.na(id_list1$ALP_max_ratio_baseline)) &
+                     (id_list1$Tbil_max_ratio_baseline<=1 | is.na(id_list1$Tbil_max_ratio_baseline)),]
+
+
+id_list2<-id_list2[id_list2$baseline_hepato==0,]
+
+#Add hospital & Insurance characteristics
+setwd("E:/Ningbo Projects/TB/TB project/Workingd/CSV files/")
+Hospital_level<-read_xls("Hospital.xls")
+Hospital_level<-Hospital_level %>% select(Reg_org,Org_out_of_Nb,Tier, )
+Insurance_level<-read_xlsx("insurance.xlsx")
+Insurance_level<-Insurance_level %>% select(dt_name,Type, )
+
+id_list3 <- inner_join(id_list2,Hospital_level,  by = "Reg_org") 
+
+ipt_dt_name<-IPT %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(dt_name), max, na.rm = F)
+ipt_dt_name<-ipt_dt_name[!is.na(ipt_dt_name$dt_name),]
+opt_dt_name<-OPT %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(dt_name), max, na.rm = F)
+opt_dt_name<-opt_dt_name[!is.na(opt_dt_name$dt_name),]
+ipt_pharm_dt_name<-IPT_pharm %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(dt_name), max, na.rm = F)
+ipt_pharm_dt_name<-ipt_pharm_dt_name[!is.na(ipt_pharm_dt_name$dt_name),]
+opt_pharm_dt_name<-OPT_pharm %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(dt_name), max, na.rm = F)
+opt_pharm_dt_name<-opt_pharm_dt_name[!is.na(opt_pharm_dt_name$dt_name),]
+dt_name_list<-rbind(ipt_dt_name,opt_dt_name,ipt_pharm_dt_name,opt_pharm_dt_name)
+dt_name<-dt_name_list %>% 
+  group_by(idcard)  %>% 
+  summarise_at(vars(dt_name), max, na.rm = F)
+
+
+id_list4 <- left_join(id_list3,dt_name,  by = "idcard") 
+id_list4 <- left_join(id_list4, Insurance_level,  by = "dt_name")
+
+#Include types of hepatoprotective agents;
+id_list4$hepatoprotectant_cat1[id_list4$'当飞利肝宁_ini_status'==1 |
+                                 id_list4$'护肝_ini_status'==1| 
+                                 id_list4$'强肝_ini_status'==1| 
+                                 id_list4$'五酯_ini_status'==1 ]<-"TCM_hepato"
+id_list4$hepatoprotectant_cat1[is.na(id_list4$hepatoprotectant_cat1)]<-"Chemical_hepato"
+
+id_list4$hepatoprotectant_cat2[id_list4$'多烯磷脂酰胆碱_ini_status'==1 ]<-"Phosphatidylcholine"
+id_list4$hepatoprotectant_cat2[id_list4$'复方牛胎肝提取物_ini_status'==1 ]<-"Cell_factor"
+id_list4$hepatoprotectant_cat2[id_list4$'甘草酸二铵_ini_status'==1 |
+                                 id_list4$'甘草酸苷_ini_status'==1 |
+                                 id_list4$'异甘草酸_ini_status'==1 ]<-"Glycyrrhetinic_acid"
+id_list4$hepatoprotectant_cat2[id_list4$'水飞蓟_ini_status'==1 |
+                                 id_list4$'当飞利肝宁_ini_status'==1 ]<-"Silymarin"
+id_list4$hepatoprotectant_cat2[id_list4$'五酯_ini_status'==1 ]<-"Schisandra"
+id_list4$hepatoprotectant_cat2[id_list4$'熊去氧胆酸_ini_status'==1 ]<-"Ursodeoxycholic"
+id_list4$hepatoprotectant_cat2[id_list4$'叶绿素铜钠_ini_status'==1 ]<-"Chlorophyllin"
+id_list4$hepatoprotectant_cat2[id_list4$'护肝_ini_status'==1 | 
+                                 id_list4$'强肝_ini_status'==1]<-"Artemisiae"
+
+id_list4$hepatoprotectant_cat3[id_list4$'多烯磷脂酰胆碱_ini_status'==1 ]<-"Membrane_protect"
+id_list4$hepatoprotectant_cat3[id_list4$'复方牛胎肝提取物_ini_status'==1 ]<-"Metabolism"
+id_list4$hepatoprotectant_cat3[id_list4$'五酯_ini_status'==1 ]<-"Enzyme_reduction"
+
+id_list4$hepatoprotectant_cat3[id_list4$'甘草酸二铵_ini_status'==1 |
+                                 id_list4$'甘草酸苷_ini_status'==1 |
+                                 id_list4$'异甘草酸_ini_status'==1 ]<-"Anti_inflam"
+id_list4$hepatoprotectant_cat3[id_list4$'水飞蓟_ini_status'==1 |
+                                 id_list4$'当飞利肝宁_ini_status'==1 ]<-"Anti-oxidase"
+
+id_list4$hepatoprotectant_cat3[id_list4$'熊去氧胆酸_ini_status'==1 ]<-"Bile"
+id_list4$hepatoprotectant_cat3[id_list4$'叶绿素铜钠_ini_status'==1 ]<-"Cell_prepare"
+id_list4$hepatoprotectant_cat3[id_list4$'护肝_ini_status'==1 | 
+                                 id_list4$'强肝_ini_status'==1]<-"Herbal"
+
+table(id_list4$hepatoprotectant_cat3)
+
+write_excel_csv(id_list4,"id_list_hepatoprotective_0125_final.csv")
+
