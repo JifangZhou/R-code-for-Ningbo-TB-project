@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2021-01-31T09:20:57.884Z" agent="5.0 (Windows)" etag="nBk8aTYCE-zwSzl71_Pd" version="13.9.1" type="github">
+<mxfile host="app.diagrams.net" modified="2021-01-31T12:58:58.705Z" agent="5.0 (Windows)" etag="QJFjXewCFVgu8I7JtAum" version="13.9.1" type="github">
   <diagram id="uHvE_O8O9B5TAk8AYGmk" name="Page-1">
     <mxGraphModel dx="1422" dy="763" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -29,31 +29,31 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="o0szKlHt9puFOY36pzJz-42" value="&lt;div&gt;&lt;b&gt;Exposed group&lt;/b&gt;&lt;/div&gt;&lt;div&gt;Exposed to liver protective agents&lt;/div&gt;&lt;div&gt;(N=2,886)&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="80" y="540" width="220" height="60" as="geometry" />
+          <mxGeometry x="80" y="540" width="240" height="60" as="geometry" />
         </mxCell>
         <mxCell id="JQ605SI2x8LaLIvw7eop-9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="JQ605SI2x8LaLIvw7eop-1" target="JQ605SI2x8LaLIvw7eop-8" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="JQ605SI2x8LaLIvw7eop-1" value="&lt;div&gt;&lt;b&gt;Reference group&lt;/b&gt;&lt;/div&gt;&lt;div&gt;Unexposed to liver protective agnets&lt;/div&gt;&lt;div&gt;(N=3,857)&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="380" y="540" width="220" height="60" as="geometry" />
+          <mxGeometry x="360" y="540" width="240" height="60" as="geometry" />
         </mxCell>
         <mxCell id="JQ605SI2x8LaLIvw7eop-11" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="JQ605SI2x8LaLIvw7eop-2" target="JQ605SI2x8LaLIvw7eop-10" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="JQ605SI2x8LaLIvw7eop-2" value="&lt;div align=&quot;left&quot;&gt;1. Cured N=833 (28.9%)&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;2. Treatment completed N= 1634 (56.6%)&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;3. ADR N=11 (0.4%)&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;4. Lost to follow-up N=287 (9.9%)&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;5. MDR-TB N=33 (1.3%)&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;6. TB-related death N=11 (0.4%)&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;7. Non-TB related death N=38 (1.3%)&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;8. Treatment failure N=39 (1.4%)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="80" y="620" width="220" height="140" as="geometry" />
+          <mxGeometry x="80" y="620" width="240" height="140" as="geometry" />
         </mxCell>
         <mxCell id="JQ605SI2x8LaLIvw7eop-13" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="JQ605SI2x8LaLIvw7eop-8" target="JQ605SI2x8LaLIvw7eop-12" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="JQ605SI2x8LaLIvw7eop-8" value="&lt;div align=&quot;left&quot;&gt;1. Cured N=1190 (30.9%)&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;2. Treatment completed N= 2102 (54.5%)&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;3. ADR N=11 (0.3%)&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;4. Lost to follow-up N=375 (9.7%)&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;5. MDR-TB N=41 (1.1%)&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;6. TB-related death N=14 (0.6%)&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;7. Non-TB related death N=51 (1.3%)&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;8. Treatment failure N=73 (1.9%)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="380" y="620" width="220" height="140" as="geometry" />
+          <mxGeometry x="360" y="620" width="240" height="140" as="geometry" />
         </mxCell>
         <mxCell id="JQ605SI2x8LaLIvw7eop-10" value="&lt;div align=&quot;left&quot;&gt;&lt;ol&gt;&lt;li&gt;DILI&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; N=376&lt;/li&gt;&lt;ol&gt;&lt;li&gt;Grade 1: N=208&lt;/li&gt;&lt;li&gt;Grade 2: N=5&lt;/li&gt;&lt;li&gt;Grade 3: N=0&lt;/li&gt;&lt;li&gt;Grade 4: N=2&lt;/li&gt;&lt;li&gt;Grade 5: N=0&lt;/li&gt;&lt;li&gt;Grade undetermined: N=161&lt;br&gt;&lt;/li&gt;&lt;/ol&gt;&lt;li&gt;Death without DILI N=47&lt;/li&gt;&lt;li&gt;Lost to follow-up N=2463&lt;/li&gt;&lt;/ol&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="80" y="780" width="220" height="150" as="geometry" />
+          <mxGeometry x="80" y="780" width="240" height="150" as="geometry" />
         </mxCell>
         <mxCell id="JQ605SI2x8LaLIvw7eop-12" value="&lt;div align=&quot;left&quot;&gt;&lt;ol&gt;&lt;li&gt;DILI&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; N=405&lt;/li&gt;&lt;ol&gt;&lt;li&gt;Grade 1: N=195&lt;/li&gt;&lt;li&gt;Grade 2: N=7&lt;/li&gt;&lt;li&gt;Grade 3: N=3&lt;/li&gt;&lt;li&gt;Grade 4: N=2&lt;/li&gt;&lt;li&gt;Grade 5: N=0&lt;/li&gt;&lt;li&gt;Grade undetermined: N=198&lt;br&gt;&lt;/li&gt;&lt;/ol&gt;&lt;li&gt;Death without DILI N=64&lt;/li&gt;&lt;li&gt;Lost to follow-up N=3388&lt;/li&gt;&lt;/ol&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;align=left;" parent="1" vertex="1">
-          <mxGeometry x="380" y="780" width="220" height="150" as="geometry" />
+          <mxGeometry x="360" y="780" width="240" height="150" as="geometry" />
         </mxCell>
         <mxCell id="3JXMQ5Bp0BYpiOlJHczw-1" value="&lt;font style=&quot;font-size: 14px&quot;&gt;&lt;b&gt;Eligibility&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;horizontal=0;" vertex="1" parent="1">
           <mxGeometry x="20" y="210" width="50" height="260" as="geometry" />
@@ -71,7 +71,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="3JXMQ5Bp0BYpiOlJHczw-5" value="&lt;div&gt;Patients with TB identified&amp;nbsp; from &lt;br&gt;&lt;/div&gt;&lt;div&gt;Ningbo regional EHR system&lt;br&gt;&lt;/div&gt;&lt;div&gt;(01/01/2010-06/30/2020)&lt;/div&gt;&lt;div&gt;&lt;div&gt;(N=19,916)&lt;/div&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
-          <mxGeometry x="134" y="40" width="190" height="60" as="geometry" />
+          <mxGeometry x="134" y="40" width="186" height="60" as="geometry" />
         </mxCell>
         <mxCell id="3JXMQ5Bp0BYpiOlJHczw-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="3JXMQ5Bp0BYpiOlJHczw-7" target="3JXMQ5Bp0BYpiOlJHczw-10">
           <mxGeometry relative="1" as="geometry">
