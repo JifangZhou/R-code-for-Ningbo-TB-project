@@ -1,0 +1,266 @@
+proc import datafile="E:\Ningbo_Projects\TB\TB project\Workingd\CSV files\id_list_0119.csv"
+out=id_list  dbms=csv replace;
+getnames=yes;
+guessingrows=10000;
+RUN;
+data id_list1;
+    set id_list; 
+    array CHAR _character_ ; 
+do over CHAR; 
+    if CHAR="NA" then call missing(CHAR);
+    else if missing(CHAR) then CHAR=" ";
+end;
+run ;
+
+DATA id_list2;
+	SET id_list1;
+	array olddates $ M2_sputum_date M3_sputum_date M5_sputum_date Rx_date Rx_end_date_x
+					OPT_min_date OPT_max_date min_disdate  max_disdate DILI_pre_date DILI_post_date
+					ALT_max_date  ALT_abn_post_date ALT_2N_post_date ALT_5N_post_date ALT_10N_post_date
+					ALP_max_date  ALP_abn_post_date ALP_2N_post_date ALP_5N_post_date ALP_10N_post_date
+					Tbil_max_date Tbil_abn_post_date Tbil_2N_post_date Tbil_5N_post_date Tbil_10N_post_date
+ 					INR_max_date INR_abn_post_date INR_2N_post_date INR_3N_post_date INR_45N_post_date 
+					PTA_min_date PTA_40_post_date
+					Ascites_pre_dx_date 		Ascites_post_dx_date
+					Hepaence_pre_dx_date 		Hepaence_post_dx_date
+					Cirrhosis_pre_dx_date 		Cirrhosis_post_dx_date
+					Fattyliver_pre_dx_date 		Fattyliver_post_dx_date
+					HBV_pre_dx_date   			HBV_post_dx_date 
+					HCV_pre_dx_date 			HCV_post_dx_date 
+					AutoHepatitis_pre_dx_date 	AutoHepatitis_post_dx_date
+					ALT_max_baseline_date	ALT_abn_pre_date
+					ALP_max_baseline_date	ALP_abn_pre_date
+					Tbil_max_baseline_date 	Tbil_abn_pre_date
+					Death_date
+					last_fol_up min_admdate max_admdate;
+	array newdates dt1-dt57;
+		do i = 1 to dim(olddates);
+			newdates(i) = input(strip(olddates(i)),yymmdd10.);
+		end;
+		drop i;
+		format dt1-dt57 yymmdd10.;
+		DROP M2_sputum_date M3_sputum_date M5_sputum_date Rx_date Rx_end_date_x
+					OPT_min_date OPT_max_date min_disdate  max_disdate DILI_pre_date DILI_post_date
+					ALT_max_date  ALT_abn_post_date ALT_2N_post_date ALT_5N_post_date ALT_10N_post_date
+					ALP_max_date  ALP_abn_post_date ALP_2N_post_date ALP_5N_post_date ALP_10N_post_date
+					Tbil_max_date Tbil_abn_post_date Tbil_2N_post_date Tbil_5N_post_date Tbil_10N_post_date
+ 					INR_max_date INR_abn_post_date INR_2N_post_date INR_3N_post_date INR_45N_post_date 
+					PTA_min_date PTA_40_post_date
+					Ascites_pre_dx_date 		Ascites_post_dx_date
+					Hepaence_pre_dx_date 		Hepaence_post_dx_date
+					Cirrhosis_pre_dx_date 		Cirrhosis_post_dx_date
+					Fattyliver_pre_dx_date 		Fattyliver_post_dx_date
+					HBV_pre_dx_date   			HBV_post_dx_date 
+					HCV_pre_dx_date 			HCV_post_dx_date 
+					AutoHepatitis_pre_dx_date 	AutoHepatitis_post_dx_date
+					ALT_max_baseline_date	ALT_abn_pre_date
+					ALP_max_baseline_date	ALP_abn_pre_date
+					Tbil_max_baseline_date 	Tbil_abn_pre_date
+					Death_date
+					last_fol_up min_admdate max_admdate;
+RUN;
+DATA id_list3;
+	SET id_list2;
+	RENAME dt1=M2_sputum_date;  RENAME dt2=M3_sputum_date;RENAME dt3=M5_sputum_date;RENAME dt4=Rx_date;RENAME dt5=Rx_end_date_x;
+		  RENAME  dt6=OPT_min_date;  RENAME dt7=OPT_max_date;  RENAME dt8=min_disdate;  RENAME dt9=max_disdate;  RENAME dt10=DILI_pre_date;  RENAME dt11=DILI_post_date;
+		  RENAME  dt12=ALT_max_date;  RENAME dt13=ALT_abn_post_date;  RENAME dt14=ALT_2N_post_date;  RENAME dt15=ALT_5N_post_date;  RENAME dt16=ALT_10N_post_date;
+		  RENAME  dt17=ALP_max_date;  RENAME dt18=ALP_abn_post_date;  RENAME dt19=ALP_2N_post_date;  RENAME dt20=ALP_5N_post_date;  RENAME dt21=ALP_10N_post_date;
+		  RENAME  dt22=Tbil_max_date;  RENAME dt23=Tbil_abn_post_date;  RENAME dt24=Tbil_2N_post_date;  RENAME dt25=Tbil_5N_post_date;  RENAME dt26=Tbil_10N_post_date;
+ 		  RENAME  dt27=INR_max_date;  RENAME dt28=INR_abn_post_date;  RENAME dt29=INR_2N_post_date;  RENAME dt30=INR_3N_post_date;  RENAME dt31=INR_45N_post_date;
+		  RENAME  dt32=PTA_min_date;  RENAME dt33=PTA_40_post_date;  
+			RENAME dt34=Ascites_pre_dx_date;  RENAME dt35=Ascites_post_dx_date
+			;  RENAME dt36=Hepaence_pre_dx_date;  RENAME dt37=Hepaence_post_dx_date
+			;  RENAME dt38=Cirrhosis_pre_dx_date;  RENAME dt39=Cirrhosis_post_dx_date
+			;  RENAME dt40=Fattyliver_pre_dx_date;  RENAME dt41=Fattyliver_post_dx_date
+			;  RENAME dt42=HBV_pre_dx_date;  RENAME dt43=HBV_post_dx_date 
+			;  RENAME dt44=HCV_pre_dx_date;  RENAME dt45=HCV_post_dx_date 
+			;  RENAME dt46=AutoHepatitis_pre_dx_date;  RENAME dt47=AutoHepatitis_post_dx_date
+			;  RENAME dt48=ALT_max_baseline_date;  RENAME dt49=ALT_abn_pre_date
+			;  RENAME dt50=ALP_max_baseline_date;  RENAME dt51=ALP_abn_pre_date
+			;  RENAME dt52=Tbil_max_baseline_date;  RENAME dt53=Tbil_abn_pre_date
+			;  RENAME dt54=Death_date
+			;  RENAME dt55=last_fol_up;
+			RENAME dt56=min_admdate;RENAME dt57= max_admdate;
+RUN;
+
+PROC CONTENTS DATA=id_list1 VARNUM;RUN;
+PROC FREQ DATA=id_list3;
+	TABLE Rx_outcome;
+RUN;
+
+DATA id_list4;
+	SET id_list3;
+	last_fol_up=max(Rx_end_date_x, OPT_max_date, max_admdate, max_disdate, Death_date);
+	IF last_fol_up>Dx_date;
+	IF age_cal>=18;
+	IF Two_encounter_baseline=1;
+	IF Rx_outcome="Dx_changed" THEN DELETE;
+	Death_fol_up=min(last_fol_up, Death_date,22096,Dx_date+730)-Dx_date;
+	Death_status=0;
+	IF Death_fol_up=Death_date-Dx_date AND Death_date ^=. THEN Death_status=1;
+	IF Rx_success=. THEN Rx_success=1;
+
+	DILI_status=0;
+	DILI_fol_up=min(DILI_post_date,last_fol_up, Rx_end_date_x, Death_date,22096,Dx_date+730)-Dx_date;
+	IF DILI_post_date ^=. AND DILI_fol_up=DILI_post_date-Dx_date THEN DILI_status=1;
+	IF Death_date ^=. AND DILI_post_date =. THEN DILI_status=2;
+	
+	DILI_final=0;
+	IF DILI_status=1 THEN DILI_final=1;
+
+	IF Co_Yinpian_ini_30=. THEN Co_Yinpian_ini_30=0;
+	IF Co_TCM_ini_30=. THEN Co_TCM_ini_30=0;
+
+	*IF baseline_hepato=1 THEN DELETE;
+	*IF DILI_pre_type = " ";
+
+	lab_abn_baseline=0;
+	IF ALT_max_ratio_baseline ^=" " AND ALT_max_ratio_baseline>1 THEN lab_abn_baseline=1;
+	IF ALP_max_ratio_baseline ^=" " AND ALP_max_ratio_baseline>1 THEN lab_abn_baseline=1;
+	IF Tbil_max_ratio_baseline ^=" " AND Tbil_max_ratio_baseline>1 THEN lab_abn_baseline=1;
+
+	IF Pregnancy_baseline=1 THEN DELETE;
+
+	*IF lab_abn_baseline=0;
+
+	*IF Rx_date ^=. ;
+	*IF Rx_date-Dx_date<=7;
+RUN;
+
+PROC FREQ DATA=id_list4;
+	TABLE DILI_status DILI_final;
+RUN;
+
+DATA id_list;
+SET id_list4;
+KEEP idcard Dx_date DILI_final baseline_hepato ini_hepato index_YEAR;
+IF DILI_final^=1 THEN DILI_final=0;
+RENAME DILI_final=outcome;
+RENAME ini_hepato=exposure;
+index_YEAR=YEAR(DX_date);
+RUN;
+
+LIBNAME workingD "E:\Ningbo_Projects\TB\TB project\Workingd\CSV files";
+proc import datafile="E:\Ningbo_Projects\TB\TB project\Workingd\CSV files\IPT_dx_all_0131.csv"
+out=IPT_dx_all  dbms=csv replace;
+getnames=yes;
+guessingrows=10000;
+RUN;
+
+proc import datafile="E:\Ningbo_Projects\TB\TB project\Workingd\CSV files\OPT_dx_all_0131.csv"
+out=OPT_dx_all  dbms=csv replace;
+getnames=yes;
+guessingrows=10000;
+RUN;
+
+DATA ipt_dx;
+	SET IPT_dx_all;
+	IF adm_time-365<=Dx_date<adm_time;
+	IF Dx_code in ("@DIAGNOSIS_ICD@"," ","-","1","--") THEN DELETE;
+	KEEP idcard Dx_code;
+DATA opt_dx;
+	SET OPT_dx_all;
+	IF clinic_time-365<=Dx_date<clinic_time;
+	IF Dx_code in ("@DIAGNOSIS_ICD@"," ","-","1","--","健康查体") THEN DELETE;
+	KEEP idcard Dx_code;
+RUN;
+
+PROC FREQ DATA=opt_dx ORDER=FREQ;
+	TABLE Dx_code;
+RUN;
+
+*Inclusion of medication domains;
+LIBNAME workingD "E:\Ningbo_Projects\TB\TB project\Workingd\CSV files";
+proc import datafile="E:\Ningbo_Projects\TB\TB project\Workingd\CSV files\IPT_pharm_Tx_0131.csv"
+out=IPT_pharm_all  dbms=csv replace;
+getnames=yes;
+guessingrows=10000;
+RUN;
+
+proc import datafile="E:\Ningbo_Projects\TB\TB project\Workingd\CSV files\OPT_pharm_Tx_0131.csv"
+out=OPT_pharm_all  dbms=csv replace;
+getnames=yes;
+guessingrows=10000;
+RUN;
+
+PROC sql;
+	CREATE table IPT_pharm as
+	SELECT a.idcard,
+		a.item_name
+	FROM IPT_pharm_all a
+	INNER JOIN id_list b
+	ON a.idcard = b.idcard AND a.intake_start_time<b.Dx_date AND a.intake_start_time>=b.Dx_date-365;
+QUIT;
+
+PROC sql;
+	CREATE table OPT_pharm as
+	SELECT a.idcard,
+		a.item_name
+	FROM OPT_pharm_all a
+	INNER JOIN id_list b
+	ON a.idcard = b.idcard AND a.clinic_time<b.Dx_date AND a.clinic_time>=b.Dx_date-365;
+QUIT;
+
+
+%include "E:/Ningbo_Projects/TB/toolbox/sas/hdmacros.sas";
+Title1 'High-dimensional propensity score adjustment';
+Title2 '(study description)';
+%InitHDMacros (
+var_patient_id = idcard,
+var_exposure = none,
+var_outcome = outcome,
+vars_demographic = none,
+vars_force_categorical = index_YEAR,
+vars_ignore = none,
+top_n = 200,
+k = 400,
+path_temp_dir = %QUOTE(E:/Ningbo_Projects/TB/),
+/* remember, no spaces in path_jar_file! */
+path_jar_file = %QUOTE(E:/Ningbo_Projects/TB/toolbox/java/pharmacoepi.jar),
+outcome_model_deciles = 0,
+outcome_model_matched = 1,
+input_cohort = id_list,
+input_dim1 = opt_dx Dx_code,
+input_dim2 = ipt_dx Dx_code,
+/*input_dim3 = IPT_pharm item_name,
+input_dim4 = OPT_pharm item_name,*/
+
+output_cohort = scored_cohort,
+result_estimates = estimates,
+result_diagnostic = result_diagnostic
+);
+%DoHDVariableSelection;
+%EstimateHDPS(dataset_with_ps);
+%RunOutcomeModels(dataset_with_ps, ps);
+
+PROC univariate DATA=Result_diagnostic_all_vars;
+	CLASS selected_for_ps;
+	VAR outcome_assoc_ranking_var;
+	histogram;
+RUN;
+
+PROC FREQ DATA=Result_diagnostic_all_vars;
+	TABLE selected_for_ps;
+RUN;
+
+PROC SORT DATA=Result_diagnostic_all_vars;
+	BY outcome_assoc_ranking_var;
+RUN;
+
+DATA Dataset_with_ps;
+	SET Dataset_with_ps;
+	IF Dx_date=. THEN DELETE;
+RUN;
+
+DATA workingD.Dataset_with_ps_wodx;
+	SET Dataset_with_ps;
+DATA workingD.Result_diagnostic_all_vars_wodx;
+	SET Result_diagnostic_all_vars;
+DATA workingD.Result_diagnostic_dim_codes_wodx;
+	SET Result_diagnostic_dim_codes;
+RUN;
+
+DATA temp;
+	SET Result_diagnostic_all_vars;
+	IF selected_for_ps= "true";
+RUN;
