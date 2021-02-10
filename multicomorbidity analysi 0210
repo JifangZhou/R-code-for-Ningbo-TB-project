@@ -1,0 +1,562 @@
+*Calculation of outcome measures
+*Load files on baseline and follow-up;
+LIBNAME workingd "E:\Ningbo_Projects\TB\TB project\Workingd\CSV files\";
+DATA id_list;
+	SET workingD.id_list0210;
+RUN;
+
+proc import datafile="E:\Ningbo_Projects\TB\TB project\Workingd\CSV files\id_member_LCA.csv"
+out=id_member_LCA  dbms=csv replace;
+getnames=yes;
+guessingrows=10000;
+RUN;	
+
+*Merge membership;
+PROC sql;
+	CREATE table id_list as
+	SELECT a.*,
+			b.LCA_model_predclass
+	FROM id_list a
+	LEFT JOIN id_member_LCA b
+	ON a.idcard=b.idcard;
+QUIT;
+DATA id_list1;
+	SET id_list;
+	IF LCA_model_predclass=. THEN LCA_model_predclass=0;
+RUN;
+
+PROC FREQ DATA=id_list1;
+	TABLE LCA_model_predclass;
+RUN;
+
+*Load ipt and opt data;
+
+proc import datafile="E:\Ningbo_Projects\TB\TB project\Workingd\CSV files\OPT.csv"
+out=OPT  dbms=csv replace;
+getnames=yes;
+guessingrows=10000;
+RUN;
+
+proc import datafile="E:\Ningbo_Projects\TB\TB project\Workingd\CSV files\IPT.csv"
+out=IPT  dbms=csv replace;
+getnames=yes;
+guessingrows=10000;
+RUN;
+
+proc import datafile="E:\Ningbo_Projects\TB\TB project\Workingd\CSV files\OPT_pharm.csv"
+out=OPT_pharm  dbms=csv replace;
+getnames=yes;
+guessingrows=10000;
+RUN;
+
+DATA IPT;
+	SET IPT;
+	newadm_time = input(adm_time,yymmdd10.);
+	RENAME newadm_time=adm_time;
+	newfee1 = input(fee1, 9.);
+   drop fee1;
+   rename newfee1=fee1;
+   	newselffee = input(selffee, 9.);
+   drop selffee;
+   rename newselffee=selffee;
+RUN;
+DATA IPT;
+	SET IPT;
+	year=YEAR(newadm_time);
+IF fee1=. THEN fee1=0;
+IF selffee=. THEN selffee=0;
+IF year=2014 THEN fee1adj=fee1;
+IF year=2015 THEN fee1adj=fee1*0.9858;
+IF year=2016 THEN fee1adj=fee1*0.9665;
+IF year=2017 THEN fee1adj=fee1*0.9516;
+IF year=2018 THEN fee1adj=fee1*0.9320;
+IF year=2019 THEN fee1adj=fee1*0.9057;
+IF year=2020 THEN fee1adj=fee1*0.8800;
+IF year=2014 THEN selffeeadj=selffee;
+IF year=2015 THEN selffeeadj=selffee*0.9858;
+IF year=2016 THEN selffeeadj=selffee*0.9665;
+IF year=2017 THEN selffeeadj=selffee*0.9516;
+IF year=2018 THEN selffeeadj=selffee*0.9320;
+IF year=2019 THEN selffeeadj=selffee*0.9057;
+IF year=2020 THEN selffeeadj=selffee*0.8800;
+KEEP idcard newadm_time dt_name fee1adj selffeeadj;
+RUN;
+DATA IPT;
+	SET IPT;
+RENAME newadm_time=adm_time;
+RUN;
+
+
+PROC sql;
+	CREATE table IPT_baseline as
+	SELECT a.*
+	FROM IPT a
+	INNER JOIN id_list1 b
+	ON a.idcard=b.idcard AND a.adm_time<b.Dx_date AND a.adm_time>=b.Dx_date-365;
+QUIT;
+PROC sql;
+	CREATE table IPT_folup as
+	SELECT a.*
+	FROM IPT a
+	INNER JOIN id_list1 b
+	ON a.idcard=b.idcard AND a.adm_time>=b.Dx_date AND a.adm_time<=b.Rx_end_date_x;
+QUIT;
+*number of admission;
+PROC sql;
+	CREATE table IPT_baseline as
+	SELECT min(idcard) as idcard,
+			count(adm_time) as adm_num_baseline,
+			sum(fee1adj) as fee1ipt_baseline,
+			sum(selffeeadj) as selffeeipt_baseline
+	FROM IPT_baseline
+	GROUP BY idcard;
+QUIT;
+PROC sql;
+	CREATE table IPT_folup as
+	SELECT min(idcard) as idcard,
+			count(adm_time) as adm_num_folup,
+			sum(fee1adj) as fee1ipt_folup,
+			sum(selffeeadj) as selffeeipt_folup
+	FROM IPT_folup
+	GROUP BY idcard;
+QUIT;
+
+proc import datafile="E:\Ningbo_Projects\TB\TB project\Workingd\CSV files\OPT.csv"
+out=OPT  dbms=csv replace;
+getnames=yes;
+guessingrows=10000;
+RUN;
+
+
+proc import datafile="E:\Ningbo_Projects\TB\TB project\Workingd\CSV files\OPT_pharm.csv"
+out=OPT_pharm  dbms=csv replace;
+getnames=yes;
+guessingrows=10000;
+RUN;
+
+DATA OPT;
+	SET OPT;
+	IF clinic_time ^=.;
+	year=YEAR(clinic_time);
+	newfee1 = input(fee1, 9.);
+   drop fee1;
+   rename newfee1=fee1;
+   	newselffee = input(selffee, 9.);
+   drop selffee;
+   rename newselffee=selffee;
+RUN;
+DATA OPT;
+	SET OPT;
+IF fee1=. THEN fee1=0;
+IF selffee=. THEN selffee=0;
+IF fee1>100000 THEN DELETE;
+IF year=2014 THEN fee1adj=fee1;
+IF year=2015 THEN fee1adj=fee1*0.9858;
+IF year=2016 THEN fee1adj=fee1*0.9665;
+IF year=2017 THEN fee1adj=fee1*0.9516;
+IF year=2018 THEN fee1adj=fee1*0.9320;
+IF year=2019 THEN fee1adj=fee1*0.9057;
+IF year=2020 THEN fee1adj=fee1*0.8800;
+IF year=2014 THEN selffeeadj=selffee;
+IF year=2015 THEN selffeeadj=selffee*0.9858;
+IF year=2016 THEN selffeeadj=selffee*0.9665;
+IF year=2017 THEN selffeeadj=selffee*0.9516;
+IF year=2018 THEN selffeeadj=selffee*0.9320;
+IF year=2019 THEN selffeeadj=selffee*0.9057;
+IF year=2020 THEN selffeeadj=selffee*0.8800;
+	KEEP idcard clinic_time dt_name fee1adj selffeeadj year;
+RUN;
+
+DATA OPT_pharm;
+	SET OPT_pharm;
+	IF clinic_time ^=.;
+	year=YEAR(clinic_time);
+	newfee1 = input(fee1, 9.);
+   drop fee1;
+   rename newfee1=fee1;
+   	newselffee = input(selffee, 9.);
+   drop selffee;
+   rename newselffee=selffee;
+RUN;
+DATA OPT_pharm;
+	SET OPT_pharm;
+IF fee1=. THEN fee1=0;
+IF selffee=. THEN selffee=0;
+IF fee1>100000 THEN DELETE;
+IF year=2014 THEN fee1adj=fee1;
+IF year=2015 THEN fee1adj=fee1*0.9858;
+IF year=2016 THEN fee1adj=fee1*0.9665;
+IF year=2017 THEN fee1adj=fee1*0.9516;
+IF year=2018 THEN fee1adj=fee1*0.9320;
+IF year=2019 THEN fee1adj=fee1*0.9057;
+IF year=2020 THEN fee1adj=fee1*0.8800;
+IF year=2014 THEN selffeeadj=selffee;
+IF year=2015 THEN selffeeadj=selffee*0.9858;
+IF year=2016 THEN selffeeadj=selffee*0.9665;
+IF year=2017 THEN selffeeadj=selffee*0.9516;
+IF year=2018 THEN selffeeadj=selffee*0.9320;
+IF year=2019 THEN selffeeadj=selffee*0.9057;
+IF year=2020 THEN selffeeadj=selffee*0.8800;
+	KEEP idcard clinic_time dt_name fee1adj selffeeadj year;
+RUN;
+
+PROC SORT DATA=OPT NODUP; 
+BY idcard;
+RUN;
+PROC SORT DATA=OPT_pharm NODUP; 
+BY idcard;
+RUN;
+
+*list of insurance;
+DATA insurance_list;
+	SET OPT OPT_pharm IPT;
+	IF dt_name="NA" THEN DELETE;
+RUN;
+PROC sql;
+	CREATE table insurance_list as
+	SELECT min(idcard) as idcard,
+			min(dt_name) as dt_name
+	FROM insurance_list
+	GROUP BY idcard;
+QUIT;
+
+PROC sql;
+	CREATE table id_list2 as
+	SELECT a.*,
+			b.*
+	FROM id_list1 a
+	LEFT JOIN insurance_list b
+	ON a.idcard=b.idcard;
+QUIT;
+
+PROC sql;
+	CREATE table OPT_baseline as
+	SELECT a.*
+	FROM OPT a
+	INNER JOIN id_list1 b
+	ON a.idcard=b.idcard AND a.clinic_time<b.Dx_date AND a.clinic_time>=b.Dx_date-365;
+QUIT;
+PROC sql;
+	CREATE table OPT_folup as
+	SELECT a.*
+	FROM OPT a
+	INNER JOIN id_list1 b
+	ON a.idcard=b.idcard AND a.clinic_time>=b.Dx_date AND a.clinic_time<=b.Rx_end_date_x;
+QUIT;
+*number of admission;
+PROC sql;
+	CREATE table OPT_baseline as
+	SELECT min(idcard) as idcard,
+			sum(fee1adj) as fee1OPT_baseline,
+			sum(selffeeadj) as selffeeOPT_baseline
+	FROM OPT_baseline
+	GROUP BY idcard;
+QUIT;
+PROC sql;
+	CREATE table OPT_folup as
+	SELECT min(idcard) as idcard,
+			sum(fee1adj) as fee1OPT_folup,
+			sum(selffeeadj) as selffeeOPT_folup
+	FROM OPT_folup
+	GROUP BY idcard;
+QUIT;
+
+PROC sql;
+	CREATE table OPT_pharm_baseline as
+	SELECT a.*
+	FROM OPT_pharm a
+	INNER JOIN id_list1 b
+	ON a.idcard=b.idcard AND a.clinic_time<b.Dx_date AND a.clinic_time>=b.Dx_date-365;
+QUIT;
+PROC sql;
+	CREATE table OPT_pharm_folup as
+	SELECT a.*
+	FROM OPT_pharm a
+	INNER JOIN id_list1 b
+	ON a.idcard=b.idcard AND a.clinic_time>=b.Dx_date AND a.clinic_time<=b.Rx_end_date_x;
+QUIT;
+*number of admission;
+PROC sql;
+	CREATE table OPT_pharm_baseline as
+	SELECT min(idcard) as idcard,
+			sum(fee1adj) as fee1OPT_pharm_baseline,
+			sum(selffeeadj) as selffeeOPT_pharm_baseline
+	FROM OPT_pharm_baseline
+	GROUP BY idcard;
+QUIT;
+PROC sql;
+	CREATE table OPT_pharm_folup as
+	SELECT min(idcard) as idcard,
+			sum(fee1adj) as fee1OPT_pharm_folup,
+			sum(selffeeadj) as selffeeOPT_pharm_folup
+	FROM OPT_pharm_folup
+	GROUP BY idcard;
+QUIT;
+
+*Merge the ipt opt and optpharm list to the original cohort list;
+PROC sql;
+	CREATE table id_list3 as
+	SELECT a.*,
+			b.*
+	FROM id_list2 a
+	LEFT JOIN IPT_baseline b
+	ON a.idcard=b.idcard;
+QUIT;
+
+PROC sql;
+	CREATE table id_list3 as
+	SELECT a.*,
+			b.*
+	FROM id_list3 a
+	LEFT JOIN IPT_folup b
+	ON a.idcard=b.idcard;
+QUIT;
+PROC sql;
+	CREATE table id_list3 as
+	SELECT a.*,
+			b.*
+	FROM id_list3 a
+	LEFT JOIN OPT_baseline b
+	ON a.idcard=b.idcard;
+QUIT;
+PROC sql;
+	CREATE table id_list3 as
+	SELECT a.*,
+			b.*
+	FROM id_list3 a
+	LEFT JOIN OPT_folup b
+	ON a.idcard=b.idcard;
+QUIT;
+PROC sql;
+	CREATE table id_list3 as
+	SELECT a.*,
+			b.*
+	FROM id_list3 a
+	LEFT JOIN OPT_pharm_baseline b
+	ON a.idcard=b.idcard;
+QUIT;
+PROC sql;
+	CREATE table id_list3 as
+	SELECT a.*,
+			b.*
+	FROM id_list3 a
+	LEFT JOIN OPT_pharm_folup b
+	ON a.idcard=b.idcard;
+QUIT;
+
+DATA id_list4;
+	SET id_list3;
+	IF fee1ipt_folup=. THEN fee1ipt_folup=0;
+	IF fee1OPT_folup=. THEN fee1OPT_folup=0;
+	IF fee1OPT_pharm_folup=. THEN fee1OPT_pharm_folup=0;
+	IF selffeeipt_folup=. THEN selffeeipt_folup=0;
+	IF selffeeOPT_folup=. THEN selffeeOPT_folup=0;
+	IF selffeeOPT_pharm_folup=. THEN selffeeOPT_pharm_folup=0;
+	feeall=fee1ipt_folup+fee1OPT_folup+fee1OPT_pharm_folup;
+	selffeeall=selffeeipt_folup+selffeeOPT_folup+selffeeOPT_pharm_folup;
+	IF feeall=. OR feeall<0 THEN feeall=0;
+	IF selffeeall=. OR selffeeall<0 THEN selffeeall=0;
+RUN;
+
+PROC MEANS DATA=id_list4;
+	CLASS LCA_model_predclass;
+	VAR feeall selffeeall;
+RUN;
+
+*Prevalence of mental health conditions;
+LIBNAME workingD "E:\Ningbo_Projects\TB\TB project\Workingd\CSV files";
+DATA condition_all;
+	SET workingD.cci_base_summary;
+	IF CCI="B" OR CCI="C";
+RUN;
+PROC sql;
+	CREATE table condition_list as
+	SELECT min(label) as label,
+			count(idcard) as num_pt
+	FROM condition_all
+	GROUP BY label;
+QUIT;
+
+proc print data=condition_list;RUN;
+
+DATA MH_condition_all;
+	SET condition_all;
+	IF label in ("Anxiety disorder, unspecified","Bipolar disorder, current episode manic severe with psychotic features",
+"Bipolar disorder, current episode manic without psychotic features, unspecified",
+"Dissociative and conversion disorder, unspecified","Major depressive disorder, single episode, unspecified",
+"Mental disorder, not otherwise specified","Manic episode, unspecified","Schizophrenia, unspecified");
+RUN;
+
+PROC sql;
+	CREATE table MH_list as
+	SELECT min(idcard) as idcard,
+			1 as MH_baseline_status
+	FROM MH_condition_all
+	GROUP BY idcard;
+QUIT;
+
+PROC sql;
+	CREATE table workingD.id_list_multicormbd_0210 as
+	SELECT a.*,
+			b.*
+	FROM id_list4 a
+	LEFT JOIN MH_list b
+	ON a.idcard=b.idcard;
+QUIT;
+
+PROC sql;
+	CREATE table condition_count_list as
+	SELECT min(idcard) as idcard,
+			count(label) as condition_count
+	FROM condition_all
+	GROUP BY idcard;
+QUIT;
+
+PROC sql;
+	CREATE table workingD.id_list_multicormbd_0210 as
+	SELECT a.*,
+			b.*
+	FROM workingD.id_list_multicormbd_0210 a
+	LEFT JOIN condition_count_list b
+	ON a.idcard=b.idcard;
+QUIT;
+
+
+proc genmod data= temp; 
+	class LCA_model_predclass (ref="0") ; 
+	model pos_feeall = LCA_model_predclass / dist=binomial link=log type3; 
+	output out=dataname pred=var1 resdev=var2 leverage=var3 cooksd=var4;
+run;
+
+proc genmod data= temp; 
+	class LCA_model_predclass (ref="0") ; 
+	model feeall = LCA_model_predclass / dist=gamma link=log type3; 
+	output out=dataname pred=var1 resdev=var2 leverage=var3 cooksd=var4;
+run;
+
+PROC MEANS DATA=dataname;
+	CLASS LCA_model_predclass;
+	VAR var1;
+RUN;
+
+PROC FREQ DATA=workingD.id_list_multicormbd_0210;
+	TABLE dt_type;
+RUN;
+DATA workingD.id_list_multicormbd_0210;
+	SET workingD.id_list_multicormbd_0210;
+IF dt_name in ("其他,社会基本医疗保险", "其他社会保险","其他社会保险,社会基本医疗保险","城镇（城乡）居民基本医疗保险","社会基本医疗保险") THEN dt_type="URRMI";
+IF dt_name in ("城镇职工基本医疗保险", "城镇职工基本医疗保险,贫困救助,社会基本医疗保险","其他社会保险,社会基本医疗保险","城镇（城乡）居民基本医疗保险") THEN dt_type="UEBMI";
+IF dt_type="" THEN dt_type="other";
+RUN;
+
+PROC FREQ DATA=workingD.id_list_multicormbd_0210;
+	TABLE dt_type;
+RUN;
+
+PROC MEANS DATA=workingD.id_list_multicormbd_0210 skew;
+	CLASS LCA_model_predclass;
+	VAR feeall selffeeall;
+RUN;
+
+DATA temp;
+	SET workingD.id_list_multicormbd_0210;
+	*IF feeall>0;
+	*IF LCA_model_predclass ^=0;
+	success=0;
+	*IF Rx_outcome="Rx_completed" OR Rx_outcome="Cured" THEN success=1;
+	*IF adm_num_folup=. THEN success=0;
+	IF selffeeall ^=0 THEN success=1;
+	pos_feeall=1;
+	IF feeall=0 THEN pos_feeall=0;
+	IF condition_count=. THEN condition_count=0;
+	length_mo=(min(Rx_end_date_x,Death_date,22096)-Dx_date)/30;
+	IF length_mo<=0 THEN length_mo=1/30;
+	fee1ipt_folup_mo=fee1ipt_folup/length_mo;
+	fee1opt_folup_mo=fee1opt_folup/length_mo;
+	fee1OPT_pharm_folup_mo=fee1OPT_pharm_folup/length_mo;
+	feeall_mo=feeall/length_mo;
+	selffeeall_mo=selffeeall/length_mo;
+RUN;
+
+proc genmod data= temp; 
+	class Sex_y dt_type Dx_type___11 Dx_type___18 LCA_model_predclass (ref="0");
+	model feeall = age_cal Sex_y dt_type Dx_type___11 Dx_type___18 LCA_model_predclass/ dist=gamma link=log type3; 
+	output out=dataname pred=var1 resdev=var2 leverage=var3 cooksd=var4;
+run;
+
+proc genmod data= temp; 
+	class Sex_y dt_type Dx_type___11 Dx_type___18 LCA_model_predclass (ref="0");
+	model feeall = LCA_model_predclass/ dist=gamma link=log type3; 
+	output out=dataname pred=var1 resdev=var2 leverage=var3 cooksd=var4;
+run;
+
+proc genmod data= temp; 
+	class Sex_y dt_type Dx_type___11 Dx_type___18 LCA_model_predclass (ref="0");
+	model selffeeall = age_cal Sex_y dt_type Dx_type___11 Dx_type___18 LCA_model_predclass/ dist=gamma link=log type3; 
+	output out=dataname pred=var1 resdev=var2 leverage=var3 cooksd=var4;
+run;
+
+proc genmod data= temp; 
+	class Sex_y dt_type Dx_type___11 Dx_type___18 LCA_model_predclass (ref="0");
+	model selffeeall = LCA_model_predclass/ dist=gamma link=log type3; 
+	output out=dataname pred=var1 resdev=var2 leverage=var3 cooksd=var4;
+run;
+
+PROC MEANS DATA=dataname n MEAN;
+	CLASS LCA_model_predclass;
+	VAR VAR1;
+RUN;
+
+
+PROC FREQ DATA=workingD.id_list_multicormbd_0210;
+	TABLE age_cat Sex_y dt_type Dx_type___11 Dx_type___18 CCI_cat condition_count/nopercent norow nocol;
+RUN;
+
+PROC MEANS  DATA=temp MEAN STD MEDIAN;
+	VAR  age_cal condition_count;
+RUN;
+
+PROC FREQ DATA=temp;
+	TABLE age_cat*LCA_model_predclass 
+Sex_y*LCA_model_predclass
+dt_type*LCA_model_predclass
+Dx_type___11*LCA_model_predclass
+Dx_type___18*LCA_model_predclass
+CCI_cat*LCA_model_predclass
+condition_count*LCA_model_predclass/nopercent norow nocol chisq;
+RUN;
+
+PROC MEANS  DATA=temp MEAN STD MEDIAN P25 P75 skew;
+	*class LCA_model_predclass;
+	VAR  fee1ipt_folup fee1opt_folup fee1OPT_pharm_folup feeall selffeeall;
+RUN;
+
+PROC MEANS  DATA=temp n MEAN STD MEDIAN P25 P75 skew;
+	*class LCA_model_predclass;
+	VAR  fee1ipt_folup_mo fee1opt_folup_mo fee1OPT_pharm_folup_mo feeall_mo selffeeall_mo;
+RUN;
+
+PROC ANOVA DATA=temp;
+	class LCA_model_predclass;
+	MODEL fee1ipt_folup_mo=LCA_model_predclass;
+RUN;
+
+PROC FREQ DATA=temp;
+	TABLE Rx_outcome*LCA_model_predclass/nopercent norow nocol chisq;
+RUN;
+
+PROC GLMSELECT DATA=temp ;
+	class LCA_model_predclass (ref="0");
+	MODEL success = LCA_model_predclass /selection=lasso(stop=none choose=cvex);
+	output out=dataname pred=var1 ;
+RUN;
+
+
+ proc logistic data=temp;
+      class Sex_y dt_type Dx_type___11 Dx_type___18 LCA_model_predclass (ref="0");
+      model success  (ref= "0")= age_cal Sex_y dt_type Dx_type___11 Dx_type___18 LCA_model_predclass/ expb;
+   run;
+ proc logistic data=temp;
+      class Sex_y dt_type Dx_type___11 Dx_type___18 LCA_model_predclass (ref="0");
+      model success  (ref= "0")= LCA_model_predclass/ expb;
+   run;
