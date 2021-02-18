@@ -1,1 +1,87 @@
-<mxfile host="app.diagrams.net" modified="2021-02-18T00:41:32.515Z" agent="5.0 (Windows)" version="14.2.9" etag="g_lpwhz3Pmg5gcpqNirR" type="github"><diagram id="B2ghDdhmflQAgiZErWa6">UzV2zq1wL0osyPDNT0nNUTV2VTV2LsrPL4GwciucU3NyVI0MMlNUjV1UjYwMgFjVyA2HrCFY1qAgsSg1rwSLBiADYTaQg2Y1AA==</diagram></mxfile>
+<mxfile host="app.diagrams.net" modified="2021-02-18T00:49:26.945Z" agent="5.0 (Windows)" etag="gy8tx5O85YAxB-kJB1oj" version="14.2.9" type="github">
+  <diagram id="B2ghDdhmflQAgiZErWa6" name="Page-1">
+    <mxGraphModel dx="1422" dy="763" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="skMIhLzMfLi_6e5SGVs_-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="skMIhLzMfLi_6e5SGVs_-2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="380" y="140" as="targetPoint" />
+            <mxPoint x="240" y="120" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="skMIhLzMfLi_6e5SGVs_-2" value="&lt;div&gt;Patients with TB identified&amp;nbsp; from &lt;br&gt;&lt;/div&gt;&lt;div&gt;Ningbo regional EHR system&lt;br&gt;&lt;/div&gt;&lt;div&gt;(01/01/2010-06/30/2020)&lt;/div&gt;&lt;div&gt;&lt;div&gt;(N=19,916)&lt;/div&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="180" y="40" width="190" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="skMIhLzMfLi_6e5SGVs_-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="skMIhLzMfLi_6e5SGVs_-4">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="380" y="140" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="skMIhLzMfLi_6e5SGVs_-4" value="&lt;div&gt;Patients with TB identifed from Ningbo CDC registries&lt;/div&gt;&lt;div&gt;(01/01/2015-12/31/2019)&lt;br&gt;&lt;/div&gt;&lt;div&gt;(N=12,174)&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="390" y="40" width="190" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="skMIhLzMfLi_6e5SGVs_-5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="skMIhLzMfLi_6e5SGVs_-7" target="skMIhLzMfLi_6e5SGVs_-11">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="380" y="240" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="skMIhLzMfLi_6e5SGVs_-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="skMIhLzMfLi_6e5SGVs_-7" target="skMIhLzMfLi_6e5SGVs_-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="skMIhLzMfLi_6e5SGVs_-7" value="&lt;div&gt;Patients linked with both data sources&lt;br&gt;&lt;/div&gt;&lt;div&gt;(N=12,087)&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="270" y="140" width="220" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="skMIhLzMfLi_6e5SGVs_-8" value="&lt;div align=&quot;left&quot;&gt;Excluded (N=2,436)&lt;/div&gt;&lt;ul&gt;&lt;li&gt;Initial TB diagnosis changed (N=406)&lt;/li&gt;&lt;li&gt;Lack of at least two healthcare encounter at baseline period (N=1,558)&lt;/li&gt;&lt;li&gt;Lack of healthcare encounter during follow-up (N=332)&lt;/li&gt;&lt;li&gt;Age at index date &amp;lt;18 years (N=140)&lt;/li&gt;&lt;/ul&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;align=left;" vertex="1" parent="1">
+          <mxGeometry x="420" y="200" width="260" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="skMIhLzMfLi_6e5SGVs_-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="skMIhLzMfLi_6e5SGVs_-11" target="skMIhLzMfLi_6e5SGVs_-21">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="380" y="460" />
+              <mxPoint x="610" y="460" />
+            </Array>
+            <mxPoint x="570" y="470" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="skMIhLzMfLi_6e5SGVs_-18" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="skMIhLzMfLi_6e5SGVs_-11" target="skMIhLzMfLi_6e5SGVs_-12">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="380" y="460" />
+              <mxPoint x="250" y="460" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="skMIhLzMfLi_6e5SGVs_-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="skMIhLzMfLi_6e5SGVs_-11" target="skMIhLzMfLi_6e5SGVs_-20">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="380" y="460" />
+              <mxPoint x="430" y="460" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="skMIhLzMfLi_6e5SGVs_-11" value="&lt;div&gt;Analytic study cohort&lt;br&gt;&lt;/div&gt;&lt;div&gt;(N=9,651)&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="270" y="370" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="skMIhLzMfLi_6e5SGVs_-12" value="&lt;div&gt;No chronic condition&lt;/div&gt;&lt;div&gt;(N=5,924)&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;align=left;" vertex="1" parent="1">
+          <mxGeometry x="180" y="480" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="skMIhLzMfLi_6e5SGVs_-14" value="&lt;font style=&quot;font-size: 14px&quot;&gt;&lt;b&gt;Eligibility&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;horizontal=0;" vertex="1" parent="1">
+          <mxGeometry x="110" y="210" width="50" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="skMIhLzMfLi_6e5SGVs_-15" value="&lt;font style=&quot;font-size: 14px&quot;&gt;&lt;b&gt;Data linkage&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;horizontal=0;" vertex="1" parent="1">
+          <mxGeometry x="110" y="40" width="50" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="skMIhLzMfLi_6e5SGVs_-16" value="&lt;div&gt;&lt;font style=&quot;font-size: 14px&quot;&gt;&lt;b&gt;Subgroups&lt;/b&gt;&lt;/font&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;horizontal=0;" vertex="1" parent="1">
+          <mxGeometry x="110" y="390" width="50" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="skMIhLzMfLi_6e5SGVs_-20" value="&lt;div&gt;Single chronic condition&lt;/div&gt;&lt;div&gt;(N=1,676)&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;align=left;" vertex="1" parent="1">
+          <mxGeometry x="360" y="480" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="skMIhLzMfLi_6e5SGVs_-21" value="&lt;div&gt;Multiple chronic condition&lt;/div&gt;&lt;div&gt;(N=2,051)&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;align=left;" vertex="1" parent="1">
+          <mxGeometry x="540" y="480" width="140" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
