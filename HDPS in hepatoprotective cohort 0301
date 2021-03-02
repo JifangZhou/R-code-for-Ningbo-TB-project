@@ -1,0 +1,443 @@
+*High dimensional comparative effectiveness assessment in the final TB cohort;
+
+*Load analytical cohort;
+proc import datafile="E:\Ningbo_Projects\TB\TB project\Workingd\CSV files\id_list_0119.csv"
+out=id_list  dbms=csv replace;
+getnames=yes;
+guessingrows=10000;
+RUN;
+
+data id_list1;
+    set id_list; 
+    array CHAR _character_ ; 
+do over CHAR; 
+    if CHAR="NA" then call missing(CHAR);
+    else if missing(CHAR) then CHAR=" ";
+end;
+run ;
+
+DATA id_list2;
+	SET id_list1;
+	array olddates $ M2_sputum_date M3_sputum_date M5_sputum_date Rx_date Rx_end_date_x
+					OPT_min_date OPT_max_date min_disdate  max_disdate DILI_pre_date DILI_post_date
+					ALT_max_date  ALT_abn_post_date ALT_2N_post_date ALT_5N_post_date ALT_10N_post_date
+					ALP_max_date  ALP_abn_post_date ALP_2N_post_date ALP_5N_post_date ALP_10N_post_date
+					Tbil_max_date Tbil_abn_post_date Tbil_2N_post_date Tbil_5N_post_date Tbil_10N_post_date
+ 					INR_max_date INR_abn_post_date INR_2N_post_date INR_3N_post_date INR_45N_post_date 
+					PTA_min_date PTA_40_post_date
+					Ascites_pre_dx_date 		Ascites_post_dx_date
+					Hepaence_pre_dx_date 		Hepaence_post_dx_date
+					Cirrhosis_pre_dx_date 		Cirrhosis_post_dx_date
+					Fattyliver_pre_dx_date 		Fattyliver_post_dx_date
+					HBV_pre_dx_date   			HBV_post_dx_date 
+					HCV_pre_dx_date 			HCV_post_dx_date 
+					AutoHepatitis_pre_dx_date 	AutoHepatitis_post_dx_date
+					ALT_max_baseline_date	ALT_abn_pre_date
+					ALP_max_baseline_date	ALP_abn_pre_date
+					Tbil_max_baseline_date 	Tbil_abn_pre_date
+					Death_date
+					last_fol_up min_admdate max_admdate;
+	array newdates dt1-dt57;
+		do i = 1 to dim(olddates);
+			newdates(i) = input(strip(olddates(i)),yymmdd10.);
+		end;
+		drop i;
+		format dt1-dt57 yymmdd10.;
+		DROP M2_sputum_date M3_sputum_date M5_sputum_date Rx_date Rx_end_date_x
+					OPT_min_date OPT_max_date min_disdate  max_disdate DILI_pre_date DILI_post_date
+					ALT_max_date  ALT_abn_post_date ALT_2N_post_date ALT_5N_post_date ALT_10N_post_date
+					ALP_max_date  ALP_abn_post_date ALP_2N_post_date ALP_5N_post_date ALP_10N_post_date
+					Tbil_max_date Tbil_abn_post_date Tbil_2N_post_date Tbil_5N_post_date Tbil_10N_post_date
+ 					INR_max_date INR_abn_post_date INR_2N_post_date INR_3N_post_date INR_45N_post_date 
+					PTA_min_date PTA_40_post_date
+					Ascites_pre_dx_date 		Ascites_post_dx_date
+					Hepaence_pre_dx_date 		Hepaence_post_dx_date
+					Cirrhosis_pre_dx_date 		Cirrhosis_post_dx_date
+					Fattyliver_pre_dx_date 		Fattyliver_post_dx_date
+					HBV_pre_dx_date   			HBV_post_dx_date 
+					HCV_pre_dx_date 			HCV_post_dx_date 
+					AutoHepatitis_pre_dx_date 	AutoHepatitis_post_dx_date
+					ALT_max_baseline_date	ALT_abn_pre_date
+					ALP_max_baseline_date	ALP_abn_pre_date
+					Tbil_max_baseline_date 	Tbil_abn_pre_date
+					Death_date
+					last_fol_up min_admdate max_admdate;
+RUN;
+DATA id_list3;
+	SET id_list2;
+	RENAME dt1=M2_sputum_date;  RENAME dt2=M3_sputum_date;RENAME dt3=M5_sputum_date;RENAME dt4=Rx_date;RENAME dt5=Rx_end_date_x;
+		  RENAME  dt6=OPT_min_date;  RENAME dt7=OPT_max_date;  RENAME dt8=min_disdate;  RENAME dt9=max_disdate;  RENAME dt10=DILI_pre_date;  RENAME dt11=DILI_post_date;
+		  RENAME  dt12=ALT_max_date;  RENAME dt13=ALT_abn_post_date;  RENAME dt14=ALT_2N_post_date;  RENAME dt15=ALT_5N_post_date;  RENAME dt16=ALT_10N_post_date;
+		  RENAME  dt17=ALP_max_date;  RENAME dt18=ALP_abn_post_date;  RENAME dt19=ALP_2N_post_date;  RENAME dt20=ALP_5N_post_date;  RENAME dt21=ALP_10N_post_date;
+		  RENAME  dt22=Tbil_max_date;  RENAME dt23=Tbil_abn_post_date;  RENAME dt24=Tbil_2N_post_date;  RENAME dt25=Tbil_5N_post_date;  RENAME dt26=Tbil_10N_post_date;
+ 		  RENAME  dt27=INR_max_date;  RENAME dt28=INR_abn_post_date;  RENAME dt29=INR_2N_post_date;  RENAME dt30=INR_3N_post_date;  RENAME dt31=INR_45N_post_date;
+		  RENAME  dt32=PTA_min_date;  RENAME dt33=PTA_40_post_date;  
+			RENAME dt34=Ascites_pre_dx_date;  RENAME dt35=Ascites_post_dx_date
+			;  RENAME dt36=Hepaence_pre_dx_date;  RENAME dt37=Hepaence_post_dx_date
+			;  RENAME dt38=Cirrhosis_pre_dx_date;  RENAME dt39=Cirrhosis_post_dx_date
+			;  RENAME dt40=Fattyliver_pre_dx_date;  RENAME dt41=Fattyliver_post_dx_date
+			;  RENAME dt42=HBV_pre_dx_date;  RENAME dt43=HBV_post_dx_date 
+			;  RENAME dt44=HCV_pre_dx_date;  RENAME dt45=HCV_post_dx_date 
+			;  RENAME dt46=AutoHepatitis_pre_dx_date;  RENAME dt47=AutoHepatitis_post_dx_date
+			;  RENAME dt48=ALT_max_baseline_date;  RENAME dt49=ALT_abn_pre_date
+			;  RENAME dt50=ALP_max_baseline_date;  RENAME dt51=ALP_abn_pre_date
+			;  RENAME dt52=Tbil_max_baseline_date;  RENAME dt53=Tbil_abn_pre_date
+			;  RENAME dt54=Death_date
+			;  RENAME dt55=last_fol_up;
+			RENAME dt56=min_admdate;RENAME dt57= max_admdate;
+RUN;
+
+PROC CONTENTS DATA=id_list1 VARNUM;RUN;
+PROC FREQ DATA=id_list3;
+	TABLE Rx_outcome;
+RUN;
+
+
+
+DATA id_list4;
+	SET id_list3;
+	last_fol_up=max(Rx_end_date_x, OPT_max_date, max_admdate, max_disdate, Death_date);
+	IF last_fol_up>Dx_date;
+	IF Rx_outcome="Dx_changed" THEN DELETE;
+	IF Rx_outcome="Other" THEN Rx_outcome="LTF";
+	IF Two_encounter_baseline=1;
+	IF max(OPT_max_date,max_admdate) ^=.;
+	IF max(OPT_max_date,max_admdate)>Dx_date;
+	IF age_cal>=18;
+	IF Pregnancy_baseline=1 THEN DELETE;
+	index_year=YEAR(Dx_date);
+	ALT_ratio_baseline=ALT_max_ratio_baseline*1;
+	ALP_ratio_baseline=ALP_max_ratio_baseline*1;
+	Tbil_ratio_baseline=Tbil_max_ratio_baseline*1;
+
+	IF CCI_liver=1 THEN DELETE;
+	IF Hx_liver_disease=1 THEN DELETE;
+ 	IF CCI_livercomplic=2 THEN DELETE;
+	IF max(Fattyliver_pre_dx_date,Cirrhosis_pre_dx_date,
+Hepaence_pre_dx_date,Ascites_pre_dx_date,AutoHepatitis_pre_dx_date,HBV_pre_dx_date,HCV_pre_dx_date) ^=. THEN DELETE;
+	IF Hx_HBV = "TRUE" THEN DELETE;
+
+	lab_abn_baseline=0;
+	IF ALT_max_ratio_baseline ^=" " AND ALT_max_ratio_baseline>1 THEN lab_abn_baseline=1;
+	IF ALP_max_ratio_baseline ^=" " AND ALP_max_ratio_baseline>1 THEN lab_abn_baseline=1;
+	IF Tbil_max_ratio_baseline ^=" " AND Tbil_max_ratio_baseline>1 THEN lab_abn_baseline=1;
+	
+	IF lab_abn_baseline=0;
+	
+	IF baseline_hepato=1 THEN DELETE;
+
+	Death_fol_up=min(last_fol_up, Death_date,22096,Dx_date+730)-Dx_date;
+	Death_status=0;
+	IF Death_fol_up=Death_date-Dx_date AND Death_date ^=. THEN Death_status=1;
+	IF Rx_success=. THEN Rx_success=1;
+
+	DILI_status=0;
+	DILI_fol_up=min(DILI_post_date,last_fol_up, Rx_end_date_x, Death_date,22096,Dx_date+730)-Dx_date;
+	IF DILI_post_date ^=. AND DILI_fol_up=DILI_post_date-Dx_date THEN DILI_status=1;
+	IF Death_date ^=. AND DILI_post_date =. THEN DILI_status=2;
+
+	DILI_final=0;
+	IF DILI_status=1 THEN DILI_final=1;
+
+	IF Co_Yinpian_ini_30=. THEN Co_Yinpian_ini_30=0;
+	IF Co_TCM_ini_30=. THEN Co_TCM_ini_30=0;
+	
+
+	RUN;
+*N=6743;
+
+LIBNAME workingD "E:\Ningbo_Projects\TB\TB project\Workingd";
+DATA workingd.id_list_DILI_0301;
+	SET id_list4;
+RUN;
+
+PROC MEANS DATA=id_list4 MEDIAN;
+	VAR DILI_fol_up;
+RUN;
+
+PROC FREQ DATA=id_list4;
+	TABLE CCI_liver Hx_liver_disease CCI_livercomplic Hx_HBV Sex_y/missing;
+RUN;
+
+PROC FREQ DATA=id_list4;
+	TABLE DILI_final*Rx_success/missing nopercent nocol;
+RUN; 
+
+DATA id_list5;
+	SET id_list4;
+	IF DILI_final in (2,3,4,5) THEN DILI_final=2;
+RUN;
+
+proc logistic data=id_list5;
+      class Sex_y  CCI_cat (ref="0") ini_hepato (ref="0") Dx_type___11
+			Dx_type___18 Co_Yinpian_ini_30 (ref="0") Co_TCM_ini_30 (ref="0") CCI_cat Smoking Alcohol index_year DILI_final (ref="0") ;
+      model Rx_success (ref= "0")= DILI_final Sex_y Age_cal index_year
+									Dx_type___11 Dx_type___18 
+									ALT_ratio_baseline ALP_ratio_baseline Tbil_ratio_baseline
+									Smoking Alcohol CCI_cat/ expb;
+	oddratio  DILI_final;
+   run;
+
+
+
+proc phreg data=id_list4;
+class Sex_y  CCI_cat (ref="0") ini_hepato (ref="0") Co_Yinpian_ini_30 (ref="0") Co_TCM_ini_30 (ref="0") / param=glm order=internal ref=first;
+model DILI_fol_up*DILI_status(0) =ini_hepato Sex_y Age_cal/ eventcode=1;
+hazardratio 'Subdistribution Hazards' ini_hepato/ diff=pairwise;
+run;
+
+proc phreg data=id_list4;
+class Sex_y  CCI_cat (ref="0") ini_hepato (ref="0") Co_Yinpian_ini_30 (ref="0") Co_TCM_ini_30 (ref="0") / param=glm order=internal ref=first;
+model DILI_fol_up*DILI_status(0) =ini_hepato/ eventcode=1;
+hazardratio 'Subdistribution Hazards' ini_hepato/ diff=pairwise;
+run;
+
+proc phreg data=id_list4;
+class Sex_y  CCI_cat (ref="0") ini_hepato (ref="0") Dx_type___11
+Dx_type___18 Co_Yinpian_ini_30 (ref="0") Co_TCM_ini_30 (ref="0") CCI_cat Smoking Alcohol index_year/ param=glm order=internal ref=first;
+model DILI_fol_up*DILI_status(0) =ini_hepato Sex_y Age_cal index_year
+									Dx_type___11 Dx_type___18 
+									ALT_ratio_baseline ALP_ratio_baseline Tbil_ratio_baseline
+									Smoking Alcohol CCI_cat/ eventcode=1;
+hazardratio 'Subdistribution Hazards' ini_hepato/ diff=pairwise;
+run;
+
+proc import datafile="E:\Ningbo_Projects\TB\TB project\Workingd\CSV files\id_list_hepatoprotective_0301_final.csv"
+out=id_list  dbms=csv replace;
+getnames=yes;
+guessingrows=10000;
+RUN;
+
+
+PROC sql;
+	CREATE table workingd.id_list_DILI_0301 as
+	SELECT a.*,
+		b.hepato_ini_count,
+		b.Org_out_of_Nb,
+		b.Tier,
+		b.dt_name,
+		b.Type,
+		b.hepatoprotectant_cat1,
+		b.hepatoprotectant_cat2,
+		b.hepatoprotectant_cat3
+
+	FROM workingd.id_list_DILI_0301 a
+	LEFT JOIN id_list b
+	ON a.idcard = b.idcard;
+QUIT;
+
+PROC FREQ DATA=workingd.id_list_DILI_0301;
+	TABLE hepatoprotectant_cat2*DILI_final;
+RUN;
+
+Glycyrrhetinic_acid 
+Silymarin
+DATA id_list_temp;
+	SET workingd.id_list_DILI_0301;
+	IF (hepatoprotectant_cat2^="Glycyrrhetinic_acid" AND hepatoprotectant_cat2^="Silymarin" ) OR ini_hepato=0;
+RUN;
+
+
+%include "E:/Ningbo_Projects/TB/toolbox/sas/hdmacros.sas";
+Title1 'High-dimensional propensity score adjustment';
+Title2 '(study description)';
+%InitHDMacros (
+var_patient_id = idcard,
+var_exposure = ini_hepato,
+var_outcome = DILI_final,
+vars_demographic = none,
+vars_force_categorical = none,
+vars_ignore = none,
+top_n = 200,
+k = 400,
+path_temp_dir = %QUOTE(E:/Ningbo_Projects/TB/),
+/* remember, no spaces in path_jar_file! */
+path_jar_file = %QUOTE(E:/Ningbo_Projects/TB/toolbox/java/pharmacoepi.jar),
+outcome_model_deciles = 0,
+outcome_model_matched = 1,
+input_cohort = workingd.id_list_DILI_0301,
+input_dim1 = opt_dx Dx_code,
+input_dim2 = ipt_dx Dx_code,
+input_dim3 = IPT_pharm item_name,
+input_dim4 = OPT_pharm item_name,
+
+output_cohort = scored_cohort,
+result_estimates = estimates,
+result_diagnostic = result_diagnostic
+);
+%DoHDVariableSelection;
+%EstimateHDPS(dataset_with_ps);
+%RunOutcomeModels(dataset_with_ps, ps);
+
+*Assessment of IPTW weights in cohort analyses;
+DATA id_list5;
+	SET Dataset_with_ps;
+	IF Dx_date=. THEN DELETE;
+	IF ini_hepato=1 THEN Wt=1/ps5;
+	IF ini_hepato=0 THEN Wt=1/(1-ps5);
+	Pt=2886/6743;
+	IF ini_hepato=1 THEN Wt_stablized=Pt/ps5;
+	IF ini_hepato=0 THEN Wt_stablized=(1-Pt)/(1-ps5);
+	
+	*IF ini_hepato = 1 AND Wt>10.45362 THEN DELETE;
+	*IF ini_hepato = 0 AND Wt>11.69111 THEN DELETE;
+	
+	*IF DILI_status=1 THEN DILI_status=0;
+	IF DILI_status=2 THEN DILI_status=0;
+RUN;
+
+PROC univariate DATA=id_list5;
+	CLASS ini_hepato;
+	VAR Wt;
+	histogram;
+RUN;
+
+PROC FREQ DATA=id_list_temp;
+	TABLE DILI_status*ini_hepato;
+RUN;
+
+PROC sql;
+	CREATE table temp as
+	SELECT count(idcard) as N,
+		sum(DILI_status) as N_event,
+		sum(DILI_fol_up) as fol_up,
+		min(hepatoprotectant_cat2) as group
+	FROM id_list5
+	GROUP BY hepatoprotectant_cat2;
+QUIT;
+
+PROC PRINT DATA=temp;RUN;
+
+proc phreg data=id_list5;
+class Sex_y  CCI_cat (ref="0") ini_hepato (ref="0") Dx_type___11
+Dx_type___18 Co_Yinpian_ini_30 (ref="0") Co_TCM_ini_30 (ref="0") CCI_cat Smoking Alcohol index_year/ param=glm order=internal ref=first;
+model DILI_fol_up*DILI_status(0) =ini_hepato Sex_y Age_cal index_year
+									Dx_type___11 Dx_type___18 
+									ALT_ratio_baseline ALP_ratio_baseline Tbil_ratio_baseline
+									Smoking Alcohol CCI_cat/ eventcode=1;
+freq Wt/notruncate;
+hazardratio 'Subdistribution Hazards' ini_hepato/ diff=pairwise;
+run;
+
+proc phreg data=id_list5;
+class Sex_y  CCI_cat (ref="0") ini_hepato (ref="0") Dx_type___11
+Dx_type___18 Co_Yinpian_ini_30 (ref="0") Co_TCM_ini_30 (ref="0") CCI_cat Smoking Alcohol index_year/ param=glm order=internal ref=first;
+model DILI_fol_up*DILI_status(0) =ini_hepato Sex_y Age_cal index_year
+									Dx_type___11 Dx_type___18 
+									ALT_ratio_baseline ALP_ratio_baseline Tbil_ratio_baseline
+									Smoking Alcohol CCI_cat/ eventcode=1;
+freq Wt_stablized/notruncate;
+hazardratio 'Subdistribution Hazards' ini_hepato/ diff=pairwise;
+run;
+proc phreg data=id_list5;
+class Sex_y  CCI_cat (ref="0") ini_hepato (ref="0") Dx_type___11
+Dx_type___18 Co_Yinpian_ini_30 (ref="0") Co_TCM_ini_30 (ref="0") CCI_cat Smoking Alcohol index_year;
+model  DILI_fol_up*DILI_status(0) =ini_hepato/ eventcode=1;
+freq Wt/notruncate;
+hazardratio ini_hepato/ diff=pairwise;
+run;
+
+proc phreg data=id_list5;
+class Sex_y  CCI_cat (ref="0") ini_hepato (ref="0") Dx_type___11
+Dx_type___18 Co_Yinpian_ini_30 (ref="0") Co_TCM_ini_30 (ref="0") CCI_cat Smoking Alcohol index_year;
+model  DILI_fol_up*DILI_status(0) =ini_hepato Sex_y Age_cal index_year
+									Dx_type___11 Dx_type___18 
+									ALT_ratio_baseline ALP_ratio_baseline Tbil_ratio_baseline
+									Smoking Alcohol CCI_cat/ eventcode=1;
+freq Wt/notruncate;
+hazardratio ini_hepato/ diff=pairwise;
+run;
+
+*Assessment of overall survival;
+*Cox PH model for death events;
+proc phreg data=id_list4;
+class Sex_y  CCI_cat (ref="0");
+model Death_fol_up*Death_status(0) = Sex_y Age_cal CCI_cat;
+hazardratio Sex_y / diff=pairwise;
+run;
+
+PROC sql;
+	CREATE table temp as
+	SELECT sum(Death_fol_up),
+			sum(Death_status),
+		min(ini_hepato)
+	FROM id_list4
+	GROUP BY ini_hepato;
+QUIT;
+
+PROC PRINT DATA=temp;RUN;
+
+proc phreg data=id_list4;
+class Sex_y  CCI_cat (ref="0") ini_hepato (ref="0") Co_Yinpian_ini_30 (ref="0") Co_TCM_ini_30 (ref="0") ;
+model  Death_fol_up*Death_status(0) =ini_hepato/ eventcode=1;
+hazardratio  ini_hepato/ diff=pairwise;
+run;
+
+proc phreg data=id_list4;
+class Sex_y  CCI_cat (ref="0") ini_hepato (ref="0") Co_Yinpian_ini_30 (ref="0") Co_TCM_ini_30 (ref="0") ;
+model  Death_fol_up*Death_status(0) =ini_hepato Sex_y Age_cal/ eventcode=1;
+hazardratio  ini_hepato/ diff=pairwise;
+run;
+
+
+proc phreg data=id_list4;
+class Sex_y  CCI_cat (ref="0") ini_hepato (ref="0") Dx_type___11
+Dx_type___18 Co_Yinpian_ini_30 (ref="0") Co_TCM_ini_30 (ref="0") CCI_cat Smoking Alcohol index_year;
+model  Death_fol_up*Death_status(0) =ini_hepato Sex_y Age_cal index_year
+									Dx_type___11 Dx_type___18 
+									ALT_ratio_baseline ALP_ratio_baseline Tbil_ratio_baseline
+									Smoking Alcohol CCI_cat/ eventcode=1;
+hazardratio ini_hepato/ diff=pairwise;
+run;
+
+PROC FREQ DATA=id_list6;
+	TABLE ini_hepato;
+RUN; 
+
+DATA id_list6;
+	SET id_list4;
+	IF (VAR202=1 AND max(VAR194, VAR195, VAR196, VAR197, VAR198, VAR199, VAR200, VAR201, VAR203, VAR204,VAR205)=0
+AND ini_hepato=1) OR 
+		ini_hepato=0;
+RUN; 
+
+DATA id_list6;
+	SET id_list4;
+	IF (max(VAR204,VAR205)=1 AND max(VAR194, VAR195, VAR196, VAR197, VAR198, VAR199, VAR200, VAR201, VAR203, VAR202)=0
+AND ini_hepato=1) OR 
+		ini_hepato=0;
+RUN; 
+
+
+PROC sql;
+	CREATE table temp as
+	SELECT sum(DILI_fol_up),
+			sum(DILI_final),
+		min(ini_hepato)
+	FROM id_list6
+	GROUP BY ini_hepato;
+QUIT;
+
+PROC PRINT DATA=temp;RUN;
+
+proc phreg data=id_list6;
+class Sex_y  CCI_cat (ref="0") ini_hepato (ref="0") Co_Yinpian_ini_30 (ref="0") Co_TCM_ini_30 (ref="0") / param=glm order=internal ref=first;
+model DILI_fol_up*DILI_status(0) =ini_hepato/ eventcode=1;
+hazardratio 'Subdistribution Hazards' ini_hepato/ diff=pairwise;
+run;
+
+proc phreg data=id_list6;
+class Sex_y  CCI_cat (ref="0") ini_hepato (ref="0") Co_Yinpian_ini_30 (ref="0") Co_TCM_ini_30 (ref="0") / param=glm order=internal ref=first;
+model DILI_fol_up*DILI_status(0) =ini_hepato Sex_y Age_cal/ eventcode=1;
+hazardratio 'Subdistribution Hazards' ini_hepato/ diff=pairwise;
+run;
+
+proc phreg data=id_list6;
+class Sex_y  CCI_cat (ref="0") ini_hepato (ref="0") Dx_type___11
+Dx_type___18 Co_Yinpian_ini_30 (ref="0") Co_TCM_ini_30 (ref="0") CCI_cat Smoking Alcohol index_year/ param=glm order=internal ref=first;
+model DILI_fol_up*DILI_status(0) =ini_hepato Sex_y Age_cal index_year
+									Dx_type___11 Dx_type___18 
+									ALT_ratio_baseline ALP_ratio_baseline Tbil_ratio_baseline
+									Smoking Alcohol CCI_cat/ eventcode=1;
+hazardratio 'Subdistribution Hazards' ini_hepato/ diff=pairwise;
+run;
